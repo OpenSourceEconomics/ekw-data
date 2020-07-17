@@ -1,0 +1,331 @@
+\documentclass[a4paper,12pt,bold]{scrartcl}
+
+\usepackage{color,colortbl}																			%Farbige Tabellen
+\usepackage{xcolor}
+
+\usepackage{apacite}
+\usepackage{footnote,placeins}
+\makesavenoteenv{tabular}
+%\usepackage{enumitem}
+\usepackage{footmisc}
+
+\renewcommand{\baselinestretch}{1.3}\normalsize
+\newcommand{\vect}[1]{\mathbf{#1}}
+\newcommand{\thin}{\thinspace}
+\newcommand{\thick}{\thickspace}
+\newcommand{\N}{\mathcal{N}}	%Normal Distribution
+\newcommand{\U}{\mathrm{U}}	%Uniform Distribution
+\newcommand{\D}{\mathrm{D}}	%Dirichlet Distribution
+\newcommand{\W}{\mathrm{W}}	%Wishart Distribution
+\newcommand{\Ind}{\mathbb{I}\,}	%Indicator Function
+
+\newcommand{\bs}{\boldsymbol}
+\newcommand{\var}{\mathrm{var}\thin}
+\newcommand{\plim}{\mathrm{plim}\thin}
+\newcommand{\cov}{\mathrm{cov}\thin}
+\newcommand\indep{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern5mu{#1#2}}}
+\usepackage{bbm}
+%\usepackage{endfloat}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+\usepackage{algpseudocode,tabularx,ragged2e}
+\newcolumntype{C}{>{\centering\arraybackslash}X} % centered "X" column
+\newcolumntype{L}{>{\arraybackslash}X} % centered "X" column
+
+\usepackage{algorithmicx}
+
+\usepackage{algorithm}
+
+\let\Algorithm\algorithm
+\renewcommand\algorithm[1][]{\Algorithm[#1]\setstretch{1.5}}
+
+
+\definecolor{lightgrey}{gray}{0.90}	%Farben mischen
+\definecolor{grey}{gray}{0.85}
+\definecolor{darkgrey}{gray}{0.65}
+\definecolor{lightblue}{rgb}{0.8,0.85,1}
+
+\newcolumntype{g}{>{\columncolor{gray}}c}
+
+\usepackage{booktabs}
+\usepackage{epigraph}
+\usepackage[sans]{dsfont}
+\usepackage[round]{natbib}
+\usepackage{bm}																									%matrix symbol
+\usepackage{setspace}																						%Fu�noten (allgm.
+\usepackage[colorlinks = true,
+            linkcolor = blue,
+            urlcolor  = blue,
+            citecolor = blue,
+            anchorcolor = blue]{hyperref}%Zeilenabst�nde)
+\usepackage{threeparttable}
+\usepackage{lscape}																							%Querformat
+\usepackage[latin1]{inputenc}																		%Umlaute
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fancybox}																						%Boxen und Rahmen
+\usepackage{appendix}
+\usepackage{listings}
+\usepackage{xr}
+
+\usepackage{enumerate}
+
+
+%\usepackage{lineno}
+%\linenumbers
+
+        																%EURO Symbol
+\usepackage{tabularx}
+\usepackage{longtable,tabu}
+\usepackage{subfig,float}																				%Mehrseitige Tabellen
+\usepackage{color,colortbl}																			%Farbige Tabellen
+\usepackage[left=2cm, right=2cm, top=2cm, bottom=2.5cm]{geometry} %Seitenr�nder
+%\usepackage[normal]{caption2}[2002/08/03]												%Titel ohne float - Umgebung
+\definecolor{lightgrey}{gray}{0.95}	%Farben mischen
+\definecolor{grey}{gray}{0.85}
+\definecolor{darkgrey}{gray}{0.80}
+
+\newcommand{\mc}{\multicolumn}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+\usepackage[labelfont=bf]{caption}
+\captionsetup[table]{skip=10pt}
+
+\usepackage{url}  % Used for linebreaks in verbatim statements
+
+\newtheorem{Definition}{Definition}
+\newtheorem{Remark}{Remark}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Excercise}{Excercise}
+\newtheorem{Result}{Result}
+\newtheorem{Proposition}{Proposition}
+\newtheorem{Prediction}{Prediction}
+\newtheorem{Solution}{Solution}
+\newtheorem{Problem}{Problem}
+
+\setlength{\skip\footins}{1.0cm}
+\deffootnote[1em]{1.1em}{0em}{\textsuperscript{\thefootnotemark}}
+\renewcommand{\arraystretch}{1.05}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\makeatletter
+\newenvironment{manquotation}[2][2em]
+  {\setlength{\@tempdima}{#1}%
+   \def\chapquote@author{#2}%
+   \parshape 1 \@tempdima \dimexpr\textwidth-2\@tempdima\relax%
+   \itshape}
+  {\par\normalfont\hfill--\ \chapquote@author\hspace*{\@tempdima}\par\bigskip}
+\makeatother
+
+\newenvironment{boenumerate}
+{\begin{enumerate}\renewcommand\labelenumi{\textbf{(\theenumi)}}}
+{\end{enumerate}}
+
+\parindent0pt
+% Color definitions Tableau 10
+% RGB codes available under https://public.tableau.com/views/TableauColors/ColorPaletteswithRGBValues?%3Aembed=y&%3AshowVizHome=no&%3Adisplay_count=y&%3Adisplay_static_image=y
+
+\definecolor{tabblue}{RGB}{31,119,180}
+% usage: blue-collar occupation
+
+\definecolor{taborange}{RGB}{255, 127, 14}
+% usage: school
+
+\definecolor{tabgreen}{RGB}{44, 160, 44}
+% usage: home
+
+\definecolor{tabred}{RGB}{214, 39, 40}
+% usage: white-collar occupation
+
+\definecolor{tabpurple}{RGB}{148, 103, 189}
+% usage: military
+
+\definecolor{tabbrown}{RGB}{140, 86, 75}
+
+\definecolor{tabrose}{RGB}{227, 119, 194}
+
+\definecolor{tabgrey}{RGB}{127, 127, 127}
+
+\definecolor{tablime}{RGB}{188, 189, 34}
+
+\definecolor{tabcyan}{RGB}{23, 190, 207}
+\begin{document}
+
+
+
+\tikzset{
+	treenode/.style = {shape=rectangle, rounded corners, draw, align=center, bottom color=blue!20},
+	root/.style     = {treenode, font=\small, draw=none},
+	env/.style      = {treenode, font=\small, draw=none},
+	dummy/.style    = {circle,draw}
+}
+
+%10,56+85,80+3,28+0,29+0,07
+
+\begin{tikzpicture}
+[
+	x=30pt,
+	y=26pt,
+	yscale=-1,
+	xscale=1,
+	baseline=-120pt,
+	grow                    = right,
+	edge from parent/.style = {draw, -latex},
+	every node/.style       = {font=\footnotesize, minimum width={width("Magnetometer")+2pt}},
+	sloped
+]
+
+% For the first, we will follow the convention: Home, Schooling, Blue, White, Military
+% TO DO: Percentage numbers to be nicer adjusted!
+
+% Zero  level: START
+\node [root, top color = tabgrey, bottom color=tabgrey] (0) at (-10,0) {\textbf{Start}};
+
+
+% First level: HOME
+\node [env, top color = tabgreen, bottom color=tabgreen, scale=0.8] (1) at (-5,-4.2) {\textbf{Home}};
+\draw[->, thick] (0) edge node[left of = 0, rotate = 72.75, node distance = 0.3cm]{$10.56\,\%$} (1);
+% Second level: Home, School, Blue, White, Military
+\node [env, top color = tabgreen, bottom color=tabgreen, scale=0.55] (11) at (0,-5) {Home};
+\draw[->] (1) edge (11);
+\node [env, top color = taborange, bottom color=taborange, scale=0.55] (12) at (0,-4.6) {School};
+\draw[->] (1) edge (12);
+\node [env, top color = tabblue, bottom color=tabblue, scale=0.55] (13) at (0,-4.2) {Blue};
+\draw[->] (1) edge (13);
+\node [env, top color = tabred, bottom color=tabred, scale=0.55] (14)  at (0,-3.8) {White};
+\draw[->] (1) edge (14);
+\node [env, top color = tabpurple, bottom color=tabpurple, scale=0.55] (15)  at (0,-3.4) {Military};
+\draw[->] (1) edge (15);
+% Third level coordinates
+\coordinate (a1) at (3,-5);
+\draw [->, dashed, color=tabgrey] (11) to[right] node[auto] {} (a1);
+\coordinate (a2) at (3,-4.6);
+\draw [->, dashed, color=tabgrey] (12) to[right] node[auto] {} (a2);
+\coordinate (a3) at (3,-4.2);
+\draw [->, dashed, color=tabgrey] (13) to[right] node[auto] {} (a3);
+\coordinate (a4) at (3,-3.8);
+\draw [->, dashed, color=tabgrey] (14) to[right] node[auto] {} (a4);
+\coordinate (a5) at (3,-3.4);
+\draw [->, dashed, color=tabgrey] (15) to[right] node[auto] {} (a5);
+
+
+
+%First level: School
+\node [env, top color = taborange, bottom color=taborange, scale=0.8] (2) at (-5,-2.1) {\textbf{School}};
+\draw[->, thick] (0) edge node[right of = 0, yshift=0.35cm,  rotate = 41.0, node distance = 0cm]{$85.80\,\%$} (2);
+% Second level: Home, School, Blue, White, Military
+\node [env, top color = tabgreen, bottom color=tabgreen, scale=0.55] (21) at (0,-2.9) {Home};
+\draw[->] (2) edge (21);
+\node [env, top color = taborange, bottom color=taborange, scale=0.55] (22) at (0,-2.5) {School};
+\draw[->] (2) edge (22);
+\node [env, top color = tabblue, bottom color=tabblue, scale=0.55] (23) at (0,-2.1) {Blue};
+\draw[->] (2) edge (23);
+\node [env, top color = tabred, bottom color=tabred, scale=0.55] (24)  at (0,-1.7) {White};
+\draw[->] (2) edge (24);
+\node [env, top color = tabpurple, bottom color=tabpurple, scale=0.55] (25)  at (0,-1.3) {Military};
+\draw[->] (2) edge (25);
+% Second level --> third level
+\coordinate (e1) at (3,-2.9);
+\draw [->, dashed, color=tabgrey] (21) to[right] node[auto] {} (e1);
+\coordinate (e2) at (3,-2.5);
+\draw [->, dashed, color=tabgrey] (22) to[right] node[auto] {} (e2);
+\coordinate (e3) at (3,-2.1);
+\draw [->, dashed, color=tabgrey] (23) to[right] node[auto] {} (e3);
+\coordinate (e4) at (3,-1.7);
+\draw [->, dashed, color=tabgrey] (24) to[right] node[auto] {} (e4);
+\coordinate (e5) at (3,-1.3);
+\draw [->, dashed, color=tabgrey] (25) to[right] node[auto] {} (e5);
+
+
+% First Level: Blue
+\node [env, top color = tabblue, bottom color=tabblue, scale=0.8] (3) at (-5,0) {\textbf{Blue}};
+\draw[->, thick] (0) edge node[right of = 0, yshift = 0.25cm, node distance = 0.2cm]{$3.28\,\%$} (3);
+% Second level: Home, School, Blue, White, Military
+\node [env, top color = tabgreen, bottom color=tabgreen, scale=0.55] (31) at (0,-0.8) {Home};
+\draw[->] (3) edge (31);
+\node [env, top color = taborange, bottom color=taborange, scale=0.55] (32) at (0,-0.4) {School};
+\draw[->] (3) edge (32);
+\node [env, top color = tabblue, bottom color=tabblue, scale=0.55] (33) at (0,0) {Blue};
+\draw[->] (3) edge (33);
+\node [env, top color = tabred, bottom color=tabred, scale=0.55] (34)  at (0,0.4) {White};
+\draw[->] (3) edge (34);
+\node [env, top color = tabpurple, bottom color=tabpurple, scale=0.55] (35)  at (0,0.8) {Military};
+\draw[->] (3) edge (35);
+% Second level --> third level
+\coordinate (c1) at (3,-0.8);
+\draw [->, dashed, color=tabgrey] (31) to[right] node[auto] {} (c1);
+\coordinate (c2) at (3,-0.4);
+\draw [->, dashed, color=tabgrey] (32) to[right] node[auto] {} (c2);
+\coordinate (c3) at (3,0);
+\draw [->, dashed, color=tabgrey] (33) to[right] node[auto] {} (c3);
+\coordinate (c4) at (3,0.4);
+\draw [->, dashed, color=tabgrey] (34) to[right] node[auto] {} (c4);
+\coordinate (c5) at (3,0.8);
+\draw [->, dashed, color=tabgrey] (35) to[right] node[auto] {} (c5);
+
+
+% First Level: White
+\node [env, top color = tabred, bottom color=tabred, scale=0.8] (4)  at (-5,2.1) {\textbf{White}};
+\draw[->, thick] (0) edge node[right of = 0, yshift=0.1cm, rotate = -38, node distance = 0.25cm]{$0.29\,\%$} (4);
+% Second level: Home, School, Blue, White, Military
+\node [env, top color = tabgreen, bottom color=tabgreen, scale=0.55] (41) at (0,1.3) {Home};
+\draw[->] (4) edge (41);
+\node [env, top color = taborange, bottom color=taborange, scale=0.55] (42) at (0,1.7) {School};
+\draw[->] (4) edge (42);
+\node [env, top color = tabblue, bottom color=tabblue, scale=0.55] (43) at (0,2.1) {Blue};
+\draw[->] (4) edge (43);
+\node [env, top color = tabred, bottom color=tabred, scale=0.55] (44)  at (0,2.5) {White};
+\draw[->] (4) edge (44);
+\node [env, top color = tabpurple, bottom color=tabpurple, scale=0.55] (45)  at (0,2.9) {Military};
+\draw[->] (4) edge (45);
+% Second level --> third level
+\coordinate (b1) at (3,1.3);
+\draw [->, dashed, color=tabgrey] (41) to[right] node[auto] {} (b1);
+\coordinate (b2) at (3,1.7);
+\draw [->, dashed, color=tabgrey] (42) to[right] node[auto] {} (b2);
+\coordinate (b3) at (3,2.1);
+\draw [->, dashed, color=tabgrey] (43) to[right] node[auto] {} (b3);
+\coordinate (b4) at (3,2.5);
+\draw [->, dashed, color=tabgrey] (44) to[right] node[auto] {} (b4);
+\coordinate (b5) at (3,2.9);
+\draw [->, dashed, color=tabgrey] (45) to[right] node[auto] {} (b5);
+
+
+% First Level: Military
+\node [env, top color = tabpurple, bottom color=tabpurple, scale=0.8] (5)  at (-5,4.2) {\textbf{Military}};
+\draw[->, thick] (0) edge node[right of = 0, yshift=0.25cm, rotate = -72.75, node distance = 0.15cm]{$0.07\,\%$} (5);
+%\draw[->, thick] (0) edge (5);
+% Second level: Home, School, Blue, White, Military
+\node [env, top color = tabgreen, bottom color=tabgreen, scale=0.55] (51)  at (0,3.4) {Home};
+\draw[->] (5) edge (51);
+\node [env, top color = taborange, bottom color=taborange, scale=0.55] (52)  at (0,3.8) {School};
+\draw[->] (5) edge (52);
+\node [env, top color = tabblue, bottom color=tabblue, scale=0.55] (53) at (0,4.2) {Blue};
+\draw[->] (5) edge (53);
+\node [env, top color = tabred, bottom color=tabred, scale=0.55] (54) at (0,4.6) {White};
+\draw[->] (5) edge (54);
+\node [env, top color = tabpurple, bottom color=tabpurple, scale=0.55] (55) at (0,5.0) {Military};
+\draw[->] (5) edge (55);
+% Second level --> third level
+\coordinate (d1) at (3,3.4);
+\draw [->, dashed, color=tabgrey] (51) to[right] node[auto] {} (d1);
+\coordinate (d2) at (3,3.8);
+\draw [->, dashed, color=tabgrey] (52) to[right] node[auto] {} (d2);
+\coordinate (d3) at (3,4.2);
+\draw [->, dashed, color=tabgrey] (53) to[right] node[auto] {} (d3);
+\coordinate (d4) at (3,4.6);
+\draw [->, dashed, color=tabgrey] (54) to[right] node[auto] {} (d4);
+\coordinate (d5) at (3,5.0);
+\draw [->, dashed, color=tabgrey] (55) to[right] node[auto] {} (d5);
+
+
+
+\end{tikzpicture}
+\end{document}
