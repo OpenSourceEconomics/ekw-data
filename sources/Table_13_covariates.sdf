@@ -1,0 +1,10 @@
+
+
+Reference
+Number     Year  Variable Description                                             Question Name  
+---------------------------------------------------------------------------------------------------
+R00001.00  1979  IDENTIFICATION CODE                                              CASEID         
+R00019.00  1979  WITH WHOM DID R LIVE AT AGE 14?                                  FAM-7          
+R00065.00  1979  HIGHEST GRADE COMPLETED BY R'S MOTHER                            HGC-MOTHER     
+R00091.00  1979  NUMBER OF SIBLINGS                                               FAM-28A        
+R02179.00  1979  TOTAL NET FAMILY INCOME IN PAST CALENDAR YEAR *KEY* (TRUNCATED)  TNFI_TRUNC     

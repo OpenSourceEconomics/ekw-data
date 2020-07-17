@@ -1,0 +1,10 @@
+notifications:
+  email:
+    on_success: never
+    on_failure: never
+
+language: python
+
+before_script: pip install -r requirements.txt
+
+script: tox
