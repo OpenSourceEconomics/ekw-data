@@ -162,8 +162,8 @@ def bc_wc_comparison(table_name, graph_name):
     ax2.set_xticks(np.arange(20, 55, 5))
     ax2.set_yticks(np.arange(20, 80, 20))
 
-    ax2.plot(sd_predictions['blue_collar'])
-    ax2.plot(sd_predictions['white_collar'])
+    ax2.plot(sd_predictions['AGE'], sd_predictions['blue_collar'])
+    ax2.plot(sd_predictions['AGE'], sd_predictions['white_collar'])
 
     ax2.spines['top'].set_visible(False)
     ax2.set_title('Actual share in blue-collar and white-collar jobs by age', size=14)
