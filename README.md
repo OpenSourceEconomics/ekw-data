@@ -10,10 +10,10 @@ This repository contains two different data sets related to
 
 This folder contains the original data set of KW97 as well as a notebook that processes and explores the estimation sample used by Michael Keane and Kenneth Wolpin to study the career decisions of young men.
 
-Please see the [notebook](http://nbviewer.jupyter.org/github/ekw-data/career_decisions_data/blob/master/explorations.ipynb) for further details.
+Please see the [notebook](http://nbviewer.jupyter.org/github/ekw-data/blob/master/career-decisions-data/explorations.ipynb) for further details.
 
 
-## structDataset
+## struct-data
 
 In this folder we maintain a cleaned version of the [National Longitudinal Survey of Youth 1979 (NLSY79)](https://www.nlsinfo.org/content/cohorts/nlsy79) in order to replicate and extend the data of KW97. This data provides the empirical support for a variety of projects on the computational challenges of estimating dynamic discrete choice models.
 
