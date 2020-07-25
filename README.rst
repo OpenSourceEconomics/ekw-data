@@ -1,5 +1,8 @@
-EKW data
-********
+.. |logo| image:: material/OSE_sb_web.svg
+   :height: 20px
+
+|logo| EKW data
+***************
 
 We maintain several benchmarking datasets for Eckstein-Keane-Wolpin models. They allow us to quickly assess the fruitfulness of possible improvements to the underlying economic model or its computational implementation in a well-known and empirically motivated setting.
 
