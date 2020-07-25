@@ -1,4 +1,4 @@
-.. |logo| image:: material/OSE_sb_web.svg
+.. |logo| image:: material/OSE_logo_no_type_RGB.svg
    :height: 20px
 
 |logo| EKW data
