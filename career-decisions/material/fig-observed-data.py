@@ -88,17 +88,13 @@ def plot_decision_by_age(df, color="color"):
 
     fig, ax = plt.subplots()
 
-    shares = (
-        df.groupby("Age").Choice.value_counts(normalize=True).unstack()[labels] * 100
-    )
+    shares = df.groupby("Age").Choice.value_counts(normalize=True).unstack()[labels] * 100
 
     if color == "color":
         shares.plot.bar(stacked=True, ax=ax, width=0.8, color=age_colors)
         savename = "fig-observed-data-choices"
     elif color == "bw":
-        shares.plot.bar(
-            stacked=True, ax=ax, width=0.8, colormap=make_grayscale_cmap("copper")
-        )
+        shares.plot.bar(stacked=True, ax=ax, width=0.8, colormap=make_grayscale_cmap("copper"))
         savename = "fig-observed-data-choices-bw"
 
     ax.set_xticklabels(np.arange(16, 27, 1), rotation="horizontal")
@@ -181,9 +177,7 @@ def plot_wage_moments(df, color="color"):
     width = 0.25
     widths = [-width, 0, width]
 
-    wage_moments = (
-        df.groupby(["Age", "Choice"])["Wage"].describe()[["mean", "std"]].unstack()
-    )
+    wage_moments = df.groupby(["Age", "Choice"])["Wage"].describe()[["mean", "std"]].unstack()
 
     for moment in ["mean", "std"]:
         fig, ax = plt.subplots()
