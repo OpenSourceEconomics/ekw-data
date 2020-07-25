@@ -6,12 +6,12 @@ We maintain several benchmarking datasets for Eckstein-Keane-Wolpin models. They
 Career decisions data set
 #########################
 
-We provide the original data set used by Keane & Wolpin (1997) in their seminal work studying the career decisions of young men. Please see this `notebook <http://nbviewer.jupyter.org/github/ekw-data/blob/master/career-decisions/explorations.ipynb/>`_ for further details.
+We provide the original data set used by Keane & Wolpin (1997) in their seminal work studying the career decisions of young men. Please see this `notebook <http://nbviewer.jupyter.org/github/ekw-data/blob/master/career-decisions/exploration.ipynb/>`_ for further details.
 
 EKW data set
 ############
 
-We provide a cleaned version of the `National Longitudinal Survey of Youth 1979 (NLSY79) <https://www.nlsinfo.org/content/cohorts/nlsy79>`_ to replicate and extend the data used by Keane and Wolpin (1997). Please see this `notebook <http://nbviewer.jupyter.org/github/ekw-data/blob/master/struct-data/explorations.ipynb/>`_ for further details.
+We provide a cleaned version of the `National Longitudinal Survey of Youth 1979 (NLSY79) <https://www.nlsinfo.org/content/cohorts/nlsy79>`_ to replicate and extend the data used by Keane and Wolpin (1997). Please see this `notebook <http://nbviewer.jupyter.org/github/ekw-data/blob/master/struct-data/exploration.ipynb/>`_ for further details.
 
 References
 ##########
