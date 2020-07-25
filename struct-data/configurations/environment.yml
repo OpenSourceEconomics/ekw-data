@@ -1,8 +1,0 @@
-name: ekw-data
-
-dependencies:
- - matplotlib>=3.0.0
- - numpy=1.13
- - pandas=0.20
- - pytest-cov
- - codecov
