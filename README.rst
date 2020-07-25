@@ -17,3 +17,10 @@ References
 **********
 
 - Keane, M. P. and Wolpin, K. I. (1997). `The career decisions of young men <http://www.journals.uchicago.edu/doi/10.1086/262080>`_. *Journal of Political Economy*, 105(3), 473-522.
+
+Supported by
+------------
+
+.. image:: material/OSE_sb_web.svg
+    :width: 22 %
+    :target: https://github.com/OpenSourceEconomics
