@@ -1,8 +1,20 @@
 .. |logo| image:: material/OSE_logo_no_type_RGB.svg
-   :height: 20px
+   :height: 22px
 
 |logo| EKW data
 ===============
+
+.. image:: https://img.shields.io/badge/License-MIT-yellow.svg
+    :target: https://opensource.org/licenses/MIT
+
+.. image:: https://github.com/OpenSourceEconomics/ekw-data/workflows/Continuous%20Integration/badge.svg
+    :target: https://github.com/OpenSourceEconomics/ekw-data/actions?query=branch%3Amaster
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+
+.. image:: https://img.shields.io/badge/zulip-join_chat-brightgreen.svg
+    :target: https://ose.zulipchat.com
 
 We maintain several benchmarking datasets for Eckstein-Keane-Wolpin models. They allow us to quickly assess the fruitfulness of possible improvements to the underlying economic model or its computational implementation in a well-known and empirically motivated setting.
 
@@ -20,18 +32,6 @@ References
 ----------
 
 - Keane, M. P. and Wolpin, K. I. (1997). `The career decisions of young men <http://www.journals.uchicago.edu/doi/10.1086/262080>`_. *Journal of Political Economy*, 105(3), 473-522.
-
-.. image:: https://img.shields.io/badge/License-MIT-yellow.svg
-    :target: https://opensource.org/licenses/MIT
-
-.. image:: https://github.com/OpenSourceEconomics/ekw-data/workflows/Continuous%20Integration/badge.svg
-    :target: https://github.com/OpenSourceEconomics/ekw-data/actions?query=branch%3Amaster
-
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/psf/black
-
-.. image:: https://img.shields.io/badge/zulip-join_chat-brightgreen.svg
-    :target: https://ose.zulipchat.com
 
 Supported by
 ------------
