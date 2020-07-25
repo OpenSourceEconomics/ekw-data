@@ -1,5 +1,5 @@
 .. |logo| image:: material/OSE_logo_no_type_RGB.svg
-   :height: 22px
+   :height: 25px
 
 |logo| EKW data
 ===============
