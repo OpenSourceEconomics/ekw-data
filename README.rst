@@ -1,7 +1,7 @@
 EKW data
 ********
 
-We maintain several benchmarking datasets for Eckstein-Keane-Wolpin models. They allow us to quickly assess the fruitfulness of possible improvements to the underlying economic model or its computational implementation.
+We maintain several benchmarking datasets for Eckstein-Keane-Wolpin models. They allow us to quickly assess the fruitfulness of possible improvements to the underlying economic model or its computational implementation in a well-known and empirically motivated setting.
 
 Career decisions data
 *********************
