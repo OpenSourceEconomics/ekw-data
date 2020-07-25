@@ -31,4 +31,3 @@ jobs:
         source .envrc
         flake8-nb; [ $? -eq 0 ] || exit 1
         black-nb --check .; [ $? -eq 0 ] || exit 1
-
