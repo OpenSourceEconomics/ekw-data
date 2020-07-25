@@ -24,7 +24,7 @@ References
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
     :target: https://opensource.org/licenses/MIT
 
-.. image:: https://github.com/OpenSourceEconomics/ekw-data/workflows/CI/badge.svg
+.. image:: https://github.com/OpenSourceEconomics/ekw-data/workflows/Continuous%20Integration/badge.svg
     :target: https://github.com/OpenSourceEconomics/ekw-data/actions?query=branch%3Amaster
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
