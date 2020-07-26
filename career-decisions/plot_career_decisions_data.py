@@ -29,7 +29,7 @@ def make_color_lighter(color, amount=0.5):
 
     try:
         _color = mc.cnames[color]
-    except:
+    except Exception:
         _color = color
     _color = colorsys.rgb_to_hls(*mc.to_rgb(_color))
 
