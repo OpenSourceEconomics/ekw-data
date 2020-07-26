@@ -163,7 +163,7 @@ def plot_wage_moments(df, savgol=False):
             sufficient_boolean = list(
                 *[df.groupby(["Age"]).Choice.value_counts().unstack()[wc] >= minimum_observations]
             )
-            non_sufficient_index = [i for i, bool in enumerate(sufficient_boolean) if bool == False]
+            non_sufficient_index = [i for i, bool in enumerate(sufficient_boolean) if bool is False]
             _wage_moments = list(wage_moments[moment][wc])
             sufficient_wage_moments = list(compress(_wage_moments, sufficient_boolean))
 
