@@ -1,8 +1,23 @@
+"""Analysis functions for career decisions data."""
+
 import pandas as pd
 import numpy as np
 
 
 def get_prepare_career_decisions_data(file):
+    """Read and reformat career decisions data (file).
+
+    Parameters:
+    -----------
+        file: str
+            Path and filename of career decisions data (data to load).
+
+    Returns:
+    --------
+        df: pd.DataFrame
+            Reformatted and indexed DataFrame of career decisions data.
+
+    """
 
     # Label and format columns
     columns = ["Identifier", "Age", "schooling_experience", "Choice", "Wage"]
@@ -83,7 +98,7 @@ def get_choices(df):
 
 
 def get_average_wages(df):
-    """Get average wages for each occupation at given period (age)
+    """Get average wages for each occupation at given period (age).
 
     Parameters:
     -----------
@@ -93,7 +108,7 @@ def get_average_wages(df):
     Returns:
     --------
         df: pd.DataFrame
-            DataFrame with average wages for each occupation at any given period (age)
+            DataFrame with average wages for each occupation at any given period (age).
 
     """
 
@@ -200,7 +215,7 @@ def get_initial_schooling_activity(df):
 
 
 def make_transition_matrix(df):
-    """Calculation of transition matrix
+    """Calculation of transition matrix.
 
     Parameters:
     -----------
@@ -248,7 +263,7 @@ def make_transition_matrix(df):
 
 
 def get_df_transition_probabilities(tm, direction):
-    """Create dataframe of transition probabilities for given direction
+    """Create dataframe of transition probabilities for given direction.
 
     Parameters:
     -----------
@@ -257,9 +272,9 @@ def get_df_transition_probabilities(tm, direction):
 
         direction: str
             "origin_to_destination": Column = origin (t), row = destination (t+1)
-                - % column (origin) goes to row (destination)
+                - % column (origin) goes to row (destination).
             "destination_to_origin": Column = destination (t), Row = origin (t-1)
-                - % column (origin) that came from row (origin)
+                - % column (origin) that came from row (origin).
 
     Returns:
     --------
