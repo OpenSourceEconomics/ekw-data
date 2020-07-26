@@ -1,3 +1,5 @@
+"""Figures for career decisions data."""
+
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import seaborn as sns
@@ -23,7 +25,7 @@ def make_color_lighter(color, amount=0.5):
     Returns:
     --------
     _color: matplotlib color string, hex string, RGB tuple
-        Brightened-up color (same format)
+        Brightened-up color (same format).
 
     """
 
@@ -131,7 +133,7 @@ def plot_wage_moments(df, savgol=False):
         Dataframe consisting of sample data.
 
     savgol: Boolean
-        Application of Savitzky Golay Filtering
+        Application of Savitzky Golay Filtering.
 
     References:
     -----------
