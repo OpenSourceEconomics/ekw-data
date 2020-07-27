@@ -220,3 +220,15 @@ def create_military_wages(agent):
     agent.loc[cond_1 & ~cond_2, 'INCOME'] = np.nan
 
     return pd.DataFrame(agent)
+
+def get_schooling_experience(agent):
+    agent['BASELINE_SCHOOLING'] = agent.loc[agent['AGE'] == 15, 'REAL_HIGHEST_GRADE_COMPLETED']
+    agent['BASELINE_SCHOOLING'].ffill(inplace=True)
+
+    agent['ADDITIONAL_SCHOOLING'] = (agent['CHOICE'] == 'schooling').astype(int).cumsum().shift(1)
+
+    agent['SCHOOLING'] = agent['BASELINE_SCHOOLING'] + agent['ADDITIONAL_SCHOOLING']
+    agent.loc[agent['AGE'] == 15, 'SCHOOLING'] = agent.loc[agent['AGE'] == 15, 'BASELINE_SCHOOLING']
+    agent.drop(columns=['BASELINE_SCHOOLING', 'ADDITIONAL_SCHOOLING'])
+
+    return agent

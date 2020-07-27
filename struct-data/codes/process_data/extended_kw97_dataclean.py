@@ -12,6 +12,7 @@ from functions_extended_clean import clean_missing_wages
 from functions_extended_clean import clean_military_wages
 from functions_extended_clean import create_wages
 from functions_extended_clean import create_military_wages
+from functions_extended_clean import get_schooling_experience
 
 df = pd.read_pickle('../../output/data/interim/original_extended_interim.pkl')
 
@@ -414,13 +415,31 @@ schooling_too_low = df.loc[cond, 'IDENTIFIER'].unique()
 
 df.drop(index=schooling_too_low, level=0, inplace=True)
 
+df = get_schooling_experience(df)
+
 # save data set
 df.to_pickle('../../output/data/final/original_extended_final.pkl')
 
-cond = df.loc[df['SURVEY_YEAR'].eq(2011), 'CHOICE'].isin(['schooling', 'blue_collar', 'white_collar', 'military', 'home'])
+# create and save continuous data set
+cond = df.loc[df['SURVEY_YEAR'].eq(2011), 'CHOICE'].isin(
+    ['schooling', 'blue_collar', 'white_collar', 'military', 'home'])
 continuous_list = list(cond.index.get_level_values(0))
 
-df = df[df['IDENTIFIER'].isin(continuous_list)]
+cont_df = df[df['IDENTIFIER'].isin(continuous_list)]
 
-# save continuous data set
-df.to_pickle('../../output/data/final/cont_original_extended_final.pkl')
+cont_df.to_pickle('../../output/data/final/cont_original_extended_final.pkl')
+
+# create and save extended replication of original KW97 data set
+cond = df['AGE'].ge(16)
+ext_kw_df = df.loc[cond, ['IDENTIFIER', 'AGE', 'SCHOOLING', 'CHOICE', 'INCOME']]
+ext_kw_df.rename(columns={'IDENTIFIER': 'Identifier', 'AGE': 'Age',
+                          'SCHOOLING': 'Schooling', 'CHOICE': 'Choice', 'INCOME': 'Wage'})
+ext_kw_df.to_csv('../../ext_kw_data.csv')
+
+# create and save replication of original KW97 data set
+cond = df['AGE'].ge(16) & df['SURVEY_YEAR'].le(1987)
+kw_df = df.loc[cond, ['IDENTIFIER', 'AGE', 'SCHOOLING', 'CHOICE', 'INCOME']]
+kw_df.rename(columns={'IDENTIFIER': 'Identifier', 'AGE': 'Age',
+                          'SCHOOLING': 'Schooling', 'CHOICE': 'Choice', 'INCOME': 'Wage'})
+kw_df.to_csv('../../kw_data.csv')
+
