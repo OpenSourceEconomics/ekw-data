@@ -433,13 +433,13 @@ cont_df.to_pickle('../../output/data/final/cont_original_extended_final.pkl')
 cond = df['AGE'].ge(16)
 ext_kw_df = df.loc[cond, ['IDENTIFIER', 'AGE', 'SCHOOLING', 'CHOICE', 'INCOME']]
 ext_kw_df.rename(columns={'IDENTIFIER': 'Identifier', 'AGE': 'Age',
-                          'SCHOOLING': 'Schooling', 'CHOICE': 'Choice', 'INCOME': 'Wage'})
-ext_kw_df.to_csv('../../ext_kw_data.csv')
+                          'SCHOOLING': 'Schooling', 'CHOICE': 'Choice', 'INCOME': 'Wage'}, inplace=True)
+ext_kw_df.to_csv('../../ext_kw_data.csv', index=False)
 
 # create and save replication of original KW97 data set
 cond = df['AGE'].ge(16) & df['SURVEY_YEAR'].le(1987)
 kw_df = df.loc[cond, ['IDENTIFIER', 'AGE', 'SCHOOLING', 'CHOICE', 'INCOME']]
 kw_df.rename(columns={'IDENTIFIER': 'Identifier', 'AGE': 'Age',
-                          'SCHOOLING': 'Schooling', 'CHOICE': 'Choice', 'INCOME': 'Wage'})
-kw_df.to_csv('../../kw_data.csv')
+                      'SCHOOLING': 'Schooling', 'CHOICE': 'Choice', 'INCOME': 'Wage'}, inplace=True)
+kw_df.to_csv('../../kw_data.csv', index=False)
 
