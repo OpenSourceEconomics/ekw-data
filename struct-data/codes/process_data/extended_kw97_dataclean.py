@@ -3,8 +3,6 @@
 
 import numpy as np
 import pandas as pd
-from heapq import nlargest
-import math
 
 from functions_extended_clean import get_occ_hours
 from functions_extended_clean import weeks_hours_worked
@@ -26,8 +24,8 @@ df["GRADE_COMPLETED"] = (
 cond = df["GRADE_COMPLETED"] < 0
 df.loc[cond, "GRADE_COMPLETED"] = 0
 
-# Merge the dataframe with the disentangled information on weekly jobs (occupation codes) and wages from
-# get_occ_codes_kw97.py
+# Merge the dataframe with the disentangled information on weekly jobs (occupation codes) and
+# wages from get_occ_codes_kw97.py
 job_choice_df = pd.read_pickle("../../output/data/interim/jobs_with_occ_codes.pkl")
 job_choice_df.index.rename(["Identifier", "Survey Year"], inplace=True)
 
@@ -36,8 +34,8 @@ df = df.join(job_choice_df, rsuffix="_y")
 # Initialize the choice variable
 df["CHOICE"] = np.nan
 
-# check whether the requirements for the choice "schooling" (see p. 483 and footnote 15 on p. 484 in KW97) are
-# fulfilled and code the responding observations accordingly
+# check whether the requirements for the choice "schooling" (see p. 483 and footnote 15 on p.
+# 484 in KW97) are fulfilled and code the responding observations accordingly
 
 # Condition 1: "An individual ist considered to have attended school
 # during the year if the individual attended in any of the three weeks..."
@@ -47,7 +45,8 @@ school_cond_1 = (
     | df["ENROLLED_SCHOOL_OCTOBER"].eq(1.0)
 )
 
-# Condition 2: "... and the individual reported completing one grade level by October 1 of the next year."
+# Condition 2: "... and the individual reported completing one grade level by October 1 of the
+# next year."
 school_cond_2 = df["GRADE_COMPLETED"].ge(1.0)  # 'GRADE_COMPLETED' might be larger than 1
 
 # Create variable which counts the number of attendance data points [October 1, January 1, April 1]
@@ -72,13 +71,13 @@ df.loc[(school_cond_1 & school_cond_2 & school_cond_3), "CHOICE"] = "schooling"
 # assign 'Schooling' if only Condition 2 (grade completed) is satisfied
 df.loc[(school_cond_2 & school_cond_4), "CHOICE"] = "schooling"
 
-# As information on monthly school attendance is available only from January 1980 onwards, individuals are assigned
-# to have chosen 'schooling' in 1978 if they completed a grade in this year
+# As information on monthly school attendance is available only from January 1980 onwards,
+# individuals are assigned to have chosen 'schooling' in 1978 if they completed a grade in this
+# year
 df.loc[(df["SURVEY_YEAR"].eq(1978)) & school_cond_2, "CHOICE"] = "schooling"
 
-
-# check whether the requirements for the choice "work" (see p. 484 in KW97; will below be separated in blue, white,
-# military)
+# check whether the requirements for the choice "work" (see p. 484 in KW97; will below be
+# separated in blue, white, military)
 id_sorted_data = df.groupby(df["IDENTIFIER"])
 df = id_sorted_data.apply(lambda x: weeks_hours_worked(x))
 
@@ -86,12 +85,12 @@ df = id_sorted_data.apply(lambda x: weeks_hours_worked(x))
 work_cond_1 = (df["WORKED_WEEKS"] / df["EMP_NONMISSING_WEEKS"]).ge(2 / 3)
 
 # Condition 2: individual for at least 20 hours on average,
-#             excluding weeks worked in military as there is no information on hours worked in the military
+# excluding weeks worked in military as there is no information on hours worked in the military
 work_cond_2 = df["SUM_MAX_HOURS"] >= (20 * df["NECESSARY_WEEKS_WORKED"])
 # work_cond_2 = (df['WORKED_HOURS'] / df['WORKED_WEEKS']).ge(20)
 
-# Condition 3: Less than 2/3 of the 9 relevant weeks have a missing labor force status, i. e. at least 4 weeks have a
-# non-missing labor force status
+# Condition 3: Less than 2/3 of the 9 relevant weeks have a missing labor force status,
+# i. e. at least 4 weeks have a non-missing labor force status
 work_cond_3 = df["EMP_NONMISSING_WEEKS"].ge(4)
 
 # Condition 4: individual did not attend school according to the criteria above
@@ -101,13 +100,14 @@ work_cond_4 = df["CHOICE"].ne("schooling")
 # Assigning work occupations will be done later
 df.loc[work_cond_1 & work_cond_2 & work_cond_3 & work_cond_4, "CHOICE"] = "Work"
 
-# If all conditions except the hours condition (cond 2)  are fulfilled, an individual did not work in white- or
-# blue-collar that year but might have worked in the military due to the missing 'hours worked' data in the military
+# If all conditions except the hours condition (cond 2)  are fulfilled, an individual did not
+# work in white- or blue-collar that year but might have worked in the military due to the
+# missing 'hours worked' data in the military
 df.loc[work_cond_1 & ~work_cond_2 & work_cond_3 & work_cond_4, "CHOICE"] = "Potentially military"
 
 
-# Next, we read in the GNP deflation data, adjust the data to base year 1987 (from 2012) and merge it with our
-# previous data
+# Next, we read in the GNP deflation data, adjust the data to base year 1987 (from 2012) and
+# merge it with our previous data
 gnp_deflation = pd.read_csv(
     "../../sources/gnp_deflator_data/st_louis_fed_deflator.csv", index_col="SURVEY_YEAR"
 )
@@ -121,8 +121,8 @@ df = df.merge(gnp_deflation, left_on="SURVEY_YEAR", right_index=True, how="outer
 df.sort_values(by=["IDENTIFIER", "SURVEY_YEAR"], inplace=True)
 
 
-# Translate the occupation codes in the "CHOICE_WK" variables to white/blue collar taking into account the change of
-# occupation coding in 2002 and 2004
+# Translate the occupation codes in the "CHOICE_WK" variables to white/blue collar taking into
+# account the change of occupation coding in 2002 and 2004
 
 # Read in csv-file
 categories_df = pd.read_pickle("../../output/data/interim/categorized_xwalk.pkl")
@@ -138,8 +138,8 @@ categories_df.columns = [
     "CPS_2002",
 ]
 
-# Construct dictionaries that assigns blue- or white-collar to each occupation for each set of occupation codes (
-# 1970, 2000, 2002)
+# Construct dictionaries that assigns blue- or white-collar to each occupation for each set of
+# occupation codes (1970, 2000, 2002)
 cond_1 = categories_df.CPS_1970.isin(range(1, 1000))
 category_dict_1970 = dict(
     zip(categories_df.CPS_1970[cond_1].astype("Int64"), categories_df.CATEGORY[cond_1])
@@ -156,23 +156,26 @@ category_dict_2002 = dict(
 )
 
 for week_num in [1, 7, 13, 14, 20, 26, 40, 46, 52]:
-    # Initialize variable that contains the chosen occupation (blue-/white-collar, military) in a given week
+    # Initialize variable that contains the chosen occupation (blue-/white-collar, military) in a
+    # given week
     df["OCC_JC_WK_" + repr(week_num)] = np.nan
 
-    # Before survey round 20 (year 2002), use 1970 occupation codes to convert occupation code to blue-/white-collar
+    # Before survey round 20 (year 2002), use 1970 occupation codes to convert occupation code to
+    # blue-/white-collar
     cond_1 = df["ROUND_JOBS_WK_" + repr(week_num)] < 20
     df.loc[cond_1, "OCC_JC_WK_" + repr(week_num)] = (
         df.loc[cond_1, "JOB_CHOICE_WK_" + repr(week_num)].astype("Int64").map(category_dict_1970)
     )
 
-    # For survey round 20 (year 2002), use 2000 occupation codes to convert occupation code to blue-/white-collar
+    # For survey round 20 (year 2002), use 2000 occupation codes to convert occupation code to
+    # blue-/white-collar
     cond_2 = df["ROUND_JOBS_WK_" + repr(week_num)] == 20
     df.loc[cond_2, "OCC_JC_WK_" + repr(week_num)] = (
         df.loc[cond_2, "JOB_CHOICE_WK_" + repr(week_num)].astype("Int64").map(category_dict_2000)
     )
 
-    # From survey round 21 (year 2004) onwards, use 2002 occupation codes  to convert occupation code to
-    # blue-/white-collar
+    # From survey round 21 (year 2004) onwards, use 2002 occupation codes  to convert occupation
+    # code to blue-/white-collar
     cond_3 = df["ROUND_JOBS_WK_" + repr(week_num)] > 20
     df.loc[cond_3, "OCC_JC_WK_" + repr(week_num)] = (
         df.loc[cond_3, "JOB_CHOICE_WK_" + repr(week_num)].astype("Int64").map(category_dict_2002)
@@ -184,10 +187,9 @@ for week_num in [1, 7, 13, 14, 20, 26, 40, 46, 52]:
     cond = df["EMP_STATUS_WK_" + repr(week_num)].eq(7.0)
     df.loc[cond, "OCC_JC_WK_" + repr(week_num)] = "military"
 
-# Shift military income by 1 given the definition of the variable (TOTAL INCOME FROM MILITARY SERVICE IN PAST CALENDAR
-# YEAR)
+# Shift military income by 1 given the definition of the variable (TOTAL INCOME FROM MILITARY
+# SERVICE IN PAST CALENDAR YEAR)
 df["INCOME_MILITARY"] = df["INCOME_MILITARY"].groupby(df["IDENTIFIER"]).apply(lambda x: x.shift(-1))
-
 
 # We now aggregate several metrics related to occupational choice
 
@@ -224,7 +226,8 @@ for week_num in [1, 7, 13, 14, 20, 26]:
     df["NOT_WORKING"] += (df["EMP_STATUS_WK_" + repr(week_num)].eq(2.0)).astype(int).fillna(0)
 
     # cond = df['AMOUNT_OF_WORK_LIMITED'].eq(1.0).astype(int)
-    # df['HEALTH_OLF'] += (df['EMP_STATUS_WK_' + repr(week_num)].eq(5.0)).astype(int).fillna(0).mul(cond)
+    # df['HEALTH_OLF'] +=
+    # (df['EMP_STATUS_WK_' + repr(week_num)].eq(5.0)).astype(int).fillna(0).mul(cond)
 
 for choice in [
     "WHITE_COLLAR",
@@ -249,13 +252,14 @@ for week_num in [40, 46, 52]:
     df["NOT_WORKING"] += (df["EMP_STATUS_WK_" + repr(week_num)].eq(2.0)).astype(int).fillna(0)
 
     # cond = df['AMOUNT_OF_WORK_LIMITED'].eq(1.0).astype(int)
-    # df['HEALTH_OLF'] += (df['EMP_STATUS_WK_' + repr(week_num)].eq(5.0)).astype(int).fillna(0).mul(cond)
+    # df['HEALTH_OLF'] += (df['EMP_STATUS_WK_' +
+    # repr(week_num)].eq(5.0)).astype(int).fillna(0).mul(cond)
 
 
 df = df.groupby(df["IDENTIFIER"]).apply(lambda x: get_occ_hours(x))
 
-# Assign the occupation in which the most weeks were worked in a given year as the work choice in that year if the
-# work criteria are satisfied, i. e. 'CHOICE' == 'Work'
+# Assign the occupation in which the most weeks were worked in a given year as the work choice
+# in that year if the work criteria are satisfied, i. e. 'CHOICE' == 'Work'
 cond_1 = df["CHOICE"] == "Work"
 cond_2 = df[["WHITE_COLLAR", "BLUE_COLLAR", "MILITARY"]].max(axis=1) > 0
 df.loc[cond_1 & cond_2, "CHOICE"] = (
@@ -265,10 +269,11 @@ df.loc[cond_1 & cond_2, "CHOICE"] = (
     .str.lower()
 )
 
-# In case there is a tie between two rows (same number of weeks worked in both occupations), the max() function in
-# Python chooses the first row encountered (see
-# https://stackoverflow.com/questions/6783000/which-maximum-does-python-pick-in-the-case-of-a-tie). To solve a tie
-# between white- and blue-collar, we choose the occupation in which more hours were worked in a given year.
+# In case there is a tie between two rows (same number of weeks worked in both occupations),
+# the max() function in Python chooses the first row encountered (see
+# https://stackoverflow.com/questions/6783000/which-maximum-does-python-pick-in-the-case-of-a
+# -tie). To solve a tie between white- and blue-collar, we choose the occupation in which more
+# hours were worked in a given year.
 cond_1 = df["CHOICE"].isin(["WHITE_COLLAR", "BLUE_COLLAR"])
 cond_2 = df["WHITE_COLLAR"].eq(df["BLUE_COLLAR"])
 cond_3 = df["WHITE_COLLAR_HOURS"].gt(df["BLUE_COLLAR_HOURS"])
@@ -277,15 +282,16 @@ cond_4 = df["BLUE_COLLAR_HOURS"].gt(df["WHITE_COLLAR_HOURS"])
 df.loc[cond_1 & cond_2 & cond_3, "CHOICE"] = "white_collar"
 df.loc[cond_1 & cond_2 & cond_4, "CHOICE"] = "blue_collar"
 
-# If all work conditions except for the average hour criterion are fulfilled and 'military' is the most often chosen
-# occupation, an individual is assigned to the military occupation
+# If all work conditions except for the average hour criterion are fulfilled and 'military' is the
+# most often chosen occupation, an individual is assigned to the military occupation
 cond_1 = df["CHOICE"] == "Potentially military"
 cond_2 = df[["WHITE_COLLAR", "BLUE_COLLAR", "MILITARY"]].idxmax(axis=1) == "MILITARY"
 
 df.loc[cond_1 & cond_2, "CHOICE"] = "military"
 
 
-# We assign all observations that are not assigned to another option until now, to the option 'home'
+# We assign all observations that are not assigned to another option until now,
+# to the option 'home'
 cond = (df["CHOICE"] == "Potentially military") | (df["CHOICE"].isna()) | (df["CHOICE"] == "Work")
 df.loc[cond, "CHOICE"] = "home"
 
@@ -293,31 +299,32 @@ df.loc[cond, "CHOICE"] = "home"
 # We initialize a new variable so which decomposes the home option
 df["HOME_CHOICE"] = np.nan
 
-# An individual who stays home and did not work for more than 1/3 of the non-missing weeks (i. e. did not satisfy
-# work_cond_1), are assigned to 'non_working'
+# An individual who stays home and did not work for more than 1/3 of the non-missing weeks
+# (i. e. did not satisfy work_cond_1), are assigned to 'non_working'
 cond = df["CHOICE"].eq("home") & (
     (df["UNEMPLOYED"] + df["OUT_OF_LABOR_FORCE"] + df["NOT_WORKING"]) / df["EMP_NONMISSING_WEEKS"]
 ).gt(1 / 3)
 df.loc[cond, "HOME_CHOICE"] = "not_working"
 
-# An individual was 'out_of_labor_force' if he was 'not_working' in the previous step and spend more time out of the
-# labor force than unemployed
+# An individual was 'out_of_labor_force' if he was 'not_working' in the previous step and spend
+# more time out of the labor force than unemployed
 cond = df["HOME_CHOICE"].eq("not_working") & df["OUT_OF_LABOR_FORCE"].gt(df["UNEMPLOYED"])
 df.loc[cond, "HOME_CHOICE"] = "out_of_labor_force"
 
-# An individual was 'unemployed' if he was 'not_working' and spend more time unemployed than out of the labor force
+# An individual was 'unemployed' if he was 'not_working' and spend more time unemployed than out
+# of the labor force
 cond = df["HOME_CHOICE"].eq("not_working") & df["UNEMPLOYED"].gt(df["OUT_OF_LABOR_FORCE"])
 df.loc[cond, "HOME_CHOICE"] = "unemployed"
 
-# An individual who stayed home and fulfills all work conditions except the average hours criterion, is assigned to
-# 'part_time_work'
+# An individual who stayed home and fulfills all work conditions except the average hours
+# criterion, is assigned to 'part_time_work'
 cond = df["CHOICE"].eq("home")
 df.loc[
     cond & work_cond_1 & ~work_cond_2 & work_cond_3 & work_cond_4, "HOME_CHOICE"
 ] = "part_time_work"
 
-# An individual has 'failed_schooling' if he did attend school according to the attendance criterion but did not
-# complete a grade
+# An individual has 'failed_schooling' if he did attend school according to the attendance
+# criterion but did not complete a grade
 cond = df["CHOICE"].eq("home")
 df.loc[cond & school_cond_1 & ~school_cond_2, "HOME_CHOICE"] = "failed_schooling"
 
@@ -337,8 +344,8 @@ df = df.groupby(df["IDENTIFIER"]).apply(lambda x: create_wages(x))
 df = df.groupby(df["IDENTIFIER"]).apply(lambda x: create_military_wages(x))
 
 
-# We remove the most extreme income outliers, i. e. values that are not within 3 standard deviations of the mean of
-# all income values
+# We remove the most extreme income outliers, i. e. values that are not within 3 standard
+# deviations of the mean of all income values
 df["INCOME_RAW"] = df["INCOME"].copy()
 
 cond = df["INCOME"] > (df["INCOME"].mean() + 3 * df["INCOME"].std())
@@ -466,8 +473,8 @@ df["CONSECUTIVE_HIGHEST_GRADES_MISSING"] = df.groupby(
 ).CONSECUTIVE_HIGHEST_GRADES_MISSING.cumsum()
 df = df.loc[df["CONSECUTIVE_HIGHEST_GRADES_MISSING"] == 0]
 
-# drop observations according to footnote 17 on p. 484
-# Create indicator variable for years in which more than 5 of the 9 weekly labor force statuses is missing
+# drop observations according to footnote 17 on p. 484 Create indicator variable for years in
+# which more than 5 of the 9 weekly labor force statuses is missing
 df["CUTOFF_WORK"] = 0
 
 cond = df["EMP_NONMISSING_WEEKS"].le(3) & df["AGE"].ge(16)
