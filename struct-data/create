@@ -5,7 +5,7 @@ the wide format.
 
 import os
 
-for dir_ in ['read_raw_data', 'process_data', 'replication_codes', 'prediction_codes', 'analysis']:
+for dir_ in ['read_raw_data', 'process_data']:
     os.chdir('codes/' + dir_)
     os.system('python create.py')
     print(dir_ + 'complete')

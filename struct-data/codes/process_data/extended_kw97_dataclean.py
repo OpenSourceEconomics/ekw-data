@@ -409,13 +409,14 @@ df.loc[cond, 'CUTOFF_WORK'] = 1
 df['CUTOFF_WORK'] = df.groupby('IDENTIFIER').CUTOFF_WORK.cumsum()
 df = df[df['CUTOFF_WORK'] == 0]
 
-# Delete all individuals for which baseline schooling (i. e. the highest grade completed at age 16) is less than 7
-cond = df['AGE'].eq(16) & df['REAL_HIGHEST_GRADE_COMPLETED'].lt(7)
+df = df.groupby(df['IDENTIFIER']).apply(lambda x: get_schooling_experience(x))
+
+
+# Delete all individuals for which baseline schooling (i. e. schooling at age 16) is less than 7
+cond = df['AGE'].eq(16) & df['SCHOOLING'].lt(7)
 schooling_too_low = df.loc[cond, 'IDENTIFIER'].unique()
 
 df.drop(index=schooling_too_low, level=0, inplace=True)
-
-df = get_schooling_experience(df)
 
 # save data set
 df.to_pickle('../../output/data/final/original_extended_final.pkl')
