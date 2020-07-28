@@ -26,12 +26,15 @@ Career decisions data
 We provide the original data set used by Keane & Wolpin (1997) in their seminal work studying the career decisions of young men. Please see this `notebook <http://nbviewer.jupyter.org/github/ekw-data/blob/master/career-decisions/exploration.ipynb/>`_ for further details.
 
 .. image:: https://mybinder.org/badge_logo.svg
- :target: https://mybinder.org/v2/gh/OpenSourceEconomics/ekw-data/blob/master/career-decisions/exploration.ipynb/master
+   :target: https://mybinder.org/v2/gh/OpenSourceEconomics/ekw-data/blob/master/career-decisions/exploration.ipynb/master
 
 Eckstein-Keane-Wolpin data
 --------------------------
 
 We provide a cleaned version of the `National Longitudinal Survey of Youth 1979 (NLSY79) <https://www.nlsinfo.org/content/cohorts/nlsy79>`_ to replicate and extend the data used by Keane and Wolpin (1997). Please see this `notebook <http://nbviewer.jupyter.org/github/ekw-data/blob/master/eckstein-keane-wolpin/exploration.ipynb/>`_ for further details.
+
+.. image:: https://mybinder.org/badge_logo.svg
+   :target: https://mybinder.org/v2/gh/OpenSourceEconomics/ekw-data/blob/master/eckstein-keane-wolpin/exploration.ipynb/master
 
 References
 ----------
