@@ -222,6 +222,10 @@ def make_transition_matrix(df, include_fifteen = False):
         df: pd.DataFrame
             DataFrame with unique Identifier (agent) containing the choice for each model period.
 
+        include_fifteen: bool
+            If True, then schooling of individuals at age 15 will be inferred from age 16 choices.
+            Transition probabilities get closer to those reported in KW97, Table 2, p.487.
+
     Returns:
     --------
         transition_matrix: dict
