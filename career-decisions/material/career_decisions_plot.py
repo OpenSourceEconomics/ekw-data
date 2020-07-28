@@ -153,12 +153,14 @@ def plot_wage_moments(df, savgol=False):
     wage_moments = df.groupby(["Age", "Choice"])["Wage"].describe()[["mean", "std"]].unstack()
 
     for moment in ["mean", "std"]:
-        fig, ax = plt.subplots(figsize=(7, 4.5))
+        fig, ax = plt.subplots(figsize=(6, 4.5))
 
         if moment == "mean":
             color_scale = 1
+            label_moment = "Average"
         if moment == "std":
             color_scale = 0.6
+            label_moment = "Standard deviation"
 
         for wc in wage_categories:
 
@@ -194,7 +196,7 @@ def plot_wage_moments(df, savgol=False):
         ax.set_xticks(df["Age"].unique())
         ax.set_xlabel("Age")
 
-        ax.set_ylabel("Average wage (in $ 1,000)", labelpad=20)
+        ax.set_ylabel(f"{label_moment} wage (in $ 1,000)", labelpad=20)
         ax.get_yaxis().set_major_formatter(
             plt.FuncFormatter(lambda x, loc: "{0:0,}".format(int(x / 1000)))
         )
