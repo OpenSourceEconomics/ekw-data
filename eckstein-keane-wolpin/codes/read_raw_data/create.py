@@ -4,12 +4,12 @@ the wide format.
 """
 
 from clsSource import SourceCls
-import create_large_files
-import process_original_csv
+import create_large_files  # noqa: F401
+import process_original_csv  # noqa: F401
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
-    fname = '../../output/data/raw/original_extended.pkl'
+    fname = "../../output/data/raw/original_extended.pkl"
 
     source_obj = SourceCls()
 

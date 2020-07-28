@@ -10,14 +10,14 @@ def aggregate_highest_degree_received(df):
     sometimes collected under two variable names. However, there is no conflicting information.
     At least one of the two is always a missing value.
     """
-    label = 'HIGHEST_DEGREE_RECEIVED'
+    label = "HIGHEST_DEGREE_RECEIVED"
 
     # This assignment rule simply takes the first assignment and then tries to replace it with
     # the second if the first is a missing value.
-    df[label] = df['HIGHEST_DEGREE_RECEIVED_1']
+    df[label] = df["HIGHEST_DEGREE_RECEIVED_1"]
 
     cond = df[label].isnull()
-    df.loc[cond, label] = df['HIGHEST_DEGREE_RECEIVED_2']
+    df.loc[cond, label] = df["HIGHEST_DEGREE_RECEIVED_2"]
 
     return df
 
@@ -25,8 +25,8 @@ def aggregate_highest_degree_received(df):
 def cleaning_highest_grade_attended(df):
     """ The variable contains a value 95 which corresponds to UNGRADED.
     """
-    cond = df['HIGHEST_GRADE_ATTENDED'] == 95
-    df.loc[cond, 'HIGHEST_GRADE_ATTENDED'] = np.nan
+    cond = df["HIGHEST_GRADE_ATTENDED"] == 95
+    df.loc[cond, "HIGHEST_GRADE_ATTENDED"] = np.nan
 
     return df
 
@@ -36,11 +36,11 @@ def aggregate_school_enrollment_monthly(df):
     collected twice due the differing time an individual is interviewed that year.
     """
     months = []
-    months += ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST']
-    months += ['SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER']
+    months += ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST"]
+    months += ["SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"]
 
     for month in months:
-        label = 'ENROLLED_SCHOOL_' + month
+        label = "ENROLLED_SCHOOL_" + month
         df[label] = np.nan
 
         # TODO: There is an open ASANA issue that tries to better understand how to deal with the
@@ -49,10 +49,10 @@ def aggregate_school_enrollment_monthly(df):
 
         # This assignment rule simply takes the first assignment and only uses the second if
         # that results in a missing value.
-        df[label] = df['ENROLLED_SCHOOL_' + month + '_1']
+        df[label] = df["ENROLLED_SCHOOL_" + month + "_1"]
 
         cond = df[label].isnull()
-        df.loc[cond, label] = df['ENROLLED_SCHOOL_' + month + '_2']
+        df.loc[cond, label] = df["ENROLLED_SCHOOL_" + month + "_2"]
 
         # It also appears that sometimes the indicator that an individual was attending school that
         # month takes values different from one. However, SELECTED is always positive and NOT
@@ -70,7 +70,7 @@ def create_is_interviewed(df):
     """ This function creates an indicator that evaluates to TRUE if an individual was
     interviewed that year based on the information about the reasons for non-interviews.
     """
-    df['IS_INTERVIEWED'] = df['REASON_NONINTERVIEW'].fillna(0) == 0
+    df["IS_INTERVIEWED"] = df["REASON_NONINTERVIEW"].fillna(0) == 0
 
     return df
 
@@ -84,35 +84,36 @@ def standarize_employer_information(df):
     """
     # We create a set of new variables to signal to users that a modification took place.
     for i in range(1, 6):
-        df['OCCALL70_MOD_JOB_' + str(i)] = df['OCCALL70_JOB_' + str(i)]
+        df["OCCALL70_MOD_JOB_" + str(i)] = df["OCCALL70_JOB_" + str(i)]
 
     # The information on #1 is missing in 1979 and 1993 as it is identical with CPSOCC70.
     for year in [1979, 1993]:
-        cond = df['SURVEY_YEAR'] == year
-        df.loc[cond, 'OCCALL70_MOD_JOB_1'] = df.loc[cond, 'CPSOCC70']
+        cond = df["SURVEY_YEAR"] == year
+        df.loc[cond, "OCCALL70_MOD_JOB_1"] = df.loc[cond, "CPSOCC70"]
 
     # For the years 1980 - 1992 there is an indicator variable that maps the CPSOCC70 information
     # to the OCCALL70 variable.
     #
     # TODO: There are two open questions that are ignored here: (1) There exist two variables in
     # 1990 that read ``INT CHECK - IS JOB #01 SAME AS CURRENT JOB?'' (R3340000, R3342400). The
-    # realizations of both variables are not identical. 
+    # realizations of both variables are not identical.
     # ANSWER: Use R3340000 (see correspondence)
     # (2) There exist a few individuals where
     # the CPSOCC indicator takes value one for more than one of the 5 OCCALL70 variables. The
     # issue is set up on ASANA and assigned to Tobias.
     for i in range(1, 6):
-        cond = (df['CPS_JOB_INDICATOR_JOB_' + str(i)] == 1)
-        df.loc[cond, 'OCCALL70_MOD_JOB_' + str(i)] = df.loc[cond, 'CPSOCC70']
+        cond = df["CPS_JOB_INDICATOR_JOB_" + str(i)] == 1
+        df.loc[cond, "OCCALL70_MOD_JOB_" + str(i)] = df.loc[cond, "CPSOCC70"]
 
     return df
 
 
 def standarize_job_information(df):
     for i in range(1, 6):
-        df['JOB_' + str(i)] = 0
-        df['JOB_' + str(i)] = df[['OCCALL70_MOD_JOB_' + str(i), 'OCCALL00_JOB_' + str(i),
-                                  'OCCALL02_JOB_' + str(i)]].sum(axis=1, min_count=1)
+        df["JOB_" + str(i)] = 0
+        df["JOB_" + str(i)] = df[
+            ["OCCALL70_MOD_JOB_" + str(i), "OCCALL00_JOB_" + str(i), "OCCALL02_JOB_" + str(i)]
+        ].sum(axis=1, min_count=1)
 
     return df
 
@@ -125,23 +126,68 @@ def calculate_afqt_scores(df):
     for more details. In addition, we adjust the Numerical Operations score along the lines
     described in NLS Attachment 106.
     """
-    df['NUMERICAL_ADJ'] = df['ASVAB_NUMERICAL_OPERATIONS']
+    df["NUMERICAL_ADJ"] = df["ASVAB_NUMERICAL_OPERATIONS"]
 
-    adjust_no = {0: 0, 1: 0, 2: 1, 3: 2, 7: 8, 8: 9, 9: 10, 10: 11, 11: 12, 12: 14, 13: 15, 14: 16,
-                 15: 17, 16: 18, 17: 19, 18: 21, 19: 22, 20: 23, 21: 24, 22: 25, 23: 26, 24: 27,
-                 25: 28, 26: 29, 27: 30, 28: 31, 29: 33, 30: 34, 31: 35, 32: 36, 33: 37, 34: 38,
-                 35: 39, 36: 39, 37: 40, 38: 41, 39: 42, 40: 43, 41: 44, 42: 45, 43: 46, 44: 47,
-                 45: 48, 46: 49, 47: 49, 48: 50, 49: 50, 50: 50}
+    adjust_no = {
+        0: 0,
+        1: 0,
+        2: 1,
+        3: 2,
+        7: 8,
+        8: 9,
+        9: 10,
+        10: 11,
+        11: 12,
+        12: 14,
+        13: 15,
+        14: 16,
+        15: 17,
+        16: 18,
+        17: 19,
+        18: 21,
+        19: 22,
+        20: 23,
+        21: 24,
+        22: 25,
+        23: 26,
+        24: 27,
+        25: 28,
+        26: 29,
+        27: 30,
+        28: 31,
+        29: 33,
+        30: 34,
+        31: 35,
+        32: 36,
+        33: 37,
+        34: 38,
+        35: 39,
+        36: 39,
+        37: 40,
+        38: 41,
+        39: 42,
+        40: 43,
+        41: 44,
+        42: 45,
+        43: 46,
+        44: 47,
+        45: 48,
+        46: 49,
+        47: 49,
+        48: 50,
+        49: 50,
+        50: 50,
+    }
 
-    df['NUMERICAL_ADJ'].replace(adjust_no, inplace=True)
+    df["NUMERICAL_ADJ"].replace(adjust_no, inplace=True)
 
-    df['AFQT_RAW'] = 0.00
-    df['AFQT_RAW'] += df['ASVAB_ARITHMETIC_REASONING']
-    df['AFQT_RAW'] += df['ASVAB_WORD_KNOWLEDGE']
-    df['AFQT_RAW'] += df['ASVAB_PARAGRAPH_COMPREHENSION']
-    df['AFQT_RAW'] += 0.5 * df['NUMERICAL_ADJ']
+    df["AFQT_RAW"] = 0.00
+    df["AFQT_RAW"] += df["ASVAB_ARITHMETIC_REASONING"]
+    df["AFQT_RAW"] += df["ASVAB_WORD_KNOWLEDGE"]
+    df["AFQT_RAW"] += df["ASVAB_PARAGRAPH_COMPREHENSION"]
+    df["AFQT_RAW"] += 0.5 * df["NUMERICAL_ADJ"]
 
-    del df['NUMERICAL_ADJ']
+    del df["NUMERICAL_ADJ"]
 
     # There are a couple of variables for which we can compute AFQT_RAW while there is no AFQT_1
     # available. The variable AFQT_1 is set to NAN by the NLSY team if the test procedure was
@@ -161,8 +207,8 @@ def calculate_afqt_scores(df):
     # subdirectory. In a nutshell, not detailed information is available anymore on the meaning
     # of the different realizations. We decided to follow the original decision of the NLSY staff
     # to only set 67 to NAN.
-    cond = df['ASVAB_ALTERED_TESTING'].isin([67])
-    df.loc[cond, 'AFQT_RAW'] = np.nan
+    cond = df["ASVAB_ALTERED_TESTING"].isin([67])
+    df.loc[cond, "AFQT_RAW"] = np.nan
 
     # We have a little unit test, where we reconstruct the AFQT_1 variable from the inputs.
     assert_equal(_test_afqt(df), True)
@@ -183,38 +229,38 @@ def aggregate_birth_information(df):
         """ This method constructs the correct birth variable for each agent.
         """
         # We want to store the original information for now for debugging and testing purposes.
-        for substring in ['YEAR_OF_BIRTH', 'MONTH_OF_BIRTH']:
+        for substring in ["YEAR_OF_BIRTH", "MONTH_OF_BIRTH"]:
             for year in [1979, 1981]:
-                agent[substring + '_' + str(year)] = agent[substring][:, year].values[0]
+                agent[substring + "_" + str(year)] = agent[substring][:, year].values[0]
             # We start with a clean slate and always prefer the information from 1981
             agent[substring] = np.nan
-            agent[substring] = agent[substring + '_1981']
+            agent[substring] = agent[substring + "_1981"]
             # However, if no information in 1981 is available we fall back to 1979.
             if agent[substring].isnull().values.any():
-                agent[substring] = agent[substring + '_1979']
+                agent[substring] = agent[substring + "_1979"]
 
         return agent
 
-    df = df.groupby('IDENTIFIER').apply(_construct_birth_info)
+    df = df.groupby("IDENTIFIER").apply(_construct_birth_info)
 
     # Now we can directly apply some basic tests to ensure that the computation was correct.
-    for substring in ['YEAR_OF_BIRTH', 'MONTH_OF_BIRTH']:
+    for substring in ["YEAR_OF_BIRTH", "MONTH_OF_BIRTH"]:
         # There cannot be any missing values in the birth variables.
         print(substring)
-        print(df.loc[df[substring].isnull(), 'IDENTIFIER'])
+        print(df.loc[df[substring].isnull(), "IDENTIFIER"])
         assert not df[substring].isnull().any()
         # Whenever there is not a missing value in for 1981 then the columns should be identical.
         # For the others it should be identical to 1979.
-        cond = (df[substring + '_1981'].notnull())
-        assert df.loc[cond, substring].equals(df.loc[cond, substring + '_1981'])
-        assert df.loc[~cond, substring].equals(df.loc[~cond, substring + '_1979'])
+        cond = df[substring + "_1981"].notnull()
+        assert df.loc[cond, substring].equals(df.loc[cond, substring + "_1981"])
+        assert df.loc[~cond, substring].equals(df.loc[~cond, substring + "_1979"])
 
     # We do not need to keep track of the intermediate variables.
-    for substring in ['YEAR_OF_BIRTH', 'MONTH_OF_BIRTH']:
+    for substring in ["YEAR_OF_BIRTH", "MONTH_OF_BIRTH"]:
         for year in [1979, 1981]:
-            del df[substring + '_' + str(year)]
+            del df[substring + "_" + str(year)]
 
-    df['YEAR_OF_BIRTH'] += 1900
+    df["YEAR_OF_BIRTH"] += 1900
 
     return df
 
@@ -228,13 +274,13 @@ def _test_afqt(df):
 
     # We need to adjust for missing values right here, even though this is done later in the code
     # for all variables.
-    for label in ['AFQT_RAW', 'AFQT_1']:
-        cond = (df_internal[label] < 0)
+    for label in ["AFQT_RAW", "AFQT_1"]:
+        cond = df_internal[label] < 0
         df_internal.loc[cond, label] = np.nan
 
     # Match ``AFQT_RAW`` to percentile of distribution
-    cond = df_internal['AFQT_RAW'] <= 23.5
-    df_internal.loc[cond, 'AFQT_PERCENTILES'] = 1
+    cond = df_internal["AFQT_RAW"] <= 23.5
+    df_internal.loc[cond, "AFQT_PERCENTILES"] = 1
 
     infos = []
     infos += [(23.50, 27.00, 2), (27.00, 29.50, 3), (29.50, 32.00, 4), (32.00, 34.00, 5)]
@@ -268,7 +314,7 @@ def _test_afqt(df):
 
     for info in infos:
         lower, upper, value = info
-        cond = (df_internal['AFQT_RAW'] > lower) & (df_internal['AFQT_RAW'] <= upper)
-        df_internal.loc[cond, 'AFQT_PERCENTILES'] = value
+        cond = (df_internal["AFQT_RAW"] > lower) & (df_internal["AFQT_RAW"] <= upper)
+        df_internal.loc[cond, "AFQT_PERCENTILES"] = value
 
-    return df_internal['AFQT_PERCENTILES'].equals(df_internal['AFQT_1'])
+    return df_internal["AFQT_PERCENTILES"].equals(df_internal["AFQT_1"])

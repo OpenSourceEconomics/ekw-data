@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 """
 """
-import xwalk_with_categories
-import preliminary_data_adjustments
-# import get_occ_codes_kw97
-import extended_kw97_dataclean
-import testing
+import xwalk_with_categories  # noqa: F401
+import preliminary_data_adjustments  # noqa: F401
+
+import extended_kw97_dataclean  # noqa: F401
