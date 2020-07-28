@@ -214,7 +214,7 @@ def get_initial_schooling_activity(df):
     return df_initial_schooling_activity
 
 
-def make_transition_matrix(df):
+def make_transition_matrix(df, include_fifteen = False):
     """Calculation of transition matrix.
 
     Parameters:
@@ -229,9 +229,27 @@ def make_transition_matrix(df):
 
     """
 
+    _df = df.copy(deep="True")
+
+    if include_fifteen:
+
+        new_row = {'Identifier': np.nan, 'Age': 15, 'schooling_experience': np.nan, 'Choice': np.nan, 'Wage': np.nan}
+        _df["Identifier"] = _df.index.get_level_values(0)
+
+        _df = _df.groupby(_df['Identifier']).apply(lambda x: x.append(new_row, ignore_index=True))
+        _df['Identifier'] = _df['Identifier'].ffill()
+        _df = _df.groupby(_df['Identifier']).apply(lambda x: x.sort_values(by=['Age']))
+
+        cond_1 = _df['Age'].eq(15)
+        cond_2 = _df['schooling_experience'].shift(-1).ge(9)
+        _df.loc[cond_1 & cond_2, 'Choice'] = 'schooling'
+
+        cond_2 = _df['schooling_experience'].shift(-1).le(8)
+        _df.loc[cond_1 & cond_2, 'Choice'] = 'home'
+
     label_order = ["blue_collar", "white_collar", "military", "schooling", "home"]
-    df["Choice_t_minus_one"] = df["Choice"].groupby("Identifier").apply(lambda x: x.shift(1))
-    df["Choice_t_plus_one"] = df["Choice"].groupby("Identifier").apply(lambda x: x.shift(-1))
+    _df["Choice_t_minus_one"] = _df["Choice"].groupby("Identifier").apply(lambda x: x.shift(1))
+    _df["Choice_t_plus_one"] = _df["Choice"].groupby("Identifier").apply(lambda x: x.shift(-1))
 
     transition_matrix = {}
     row_order = label_order
@@ -250,8 +268,8 @@ def make_transition_matrix(df):
 
     for transition_direction in ["origin_to_destination", "destination_from_origin"]:
         transition_matrix[f"{transition_direction}"] = pd.crosstab(
-            index=df[_relevant_choice[f"{transition_direction}"]],
-            columns=df["Choice"],
+            index=_df[_relevant_choice[f"{transition_direction}"]],
+            columns=_df["Choice"],
             normalize="index",
         ).round(4)
 
