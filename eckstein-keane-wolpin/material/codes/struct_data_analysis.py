@@ -20,7 +20,6 @@ def get_prepare_struct_data(file):
     """
 
     # Label and format columns
-    columns = ["Identifier", "Age", "Schooling", "Choice", "Wage"]
     dtype = {
         "Identifier": np.int,
         "Age": np.int64,
@@ -32,8 +31,13 @@ def get_prepare_struct_data(file):
     df = pd.read_csv(file, dtype=dtype)
     # Labeling different choice categories, introduction period, setting index
     df["Choice"] = df["Choice"].map(
-        {"schooling": "Schooling", "home": "Home", "white_collar": "White",
-         "blue_collar": "Blue", "military": "Military"}
+        {
+            "schooling": "Schooling",
+            "home": "Home",
+            "white_collar": "White",
+            "blue_collar": "Blue",
+            "military": "Military",
+        }
     )
     df["Period"] = df["Age"] - 16
     df.set_index(["Identifier", "Period"], inplace=True, drop=True)
