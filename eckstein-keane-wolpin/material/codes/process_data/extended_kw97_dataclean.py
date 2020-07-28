@@ -509,7 +509,7 @@ ext_kw_df.rename(
     },
     inplace=True,
 )
-ext_kw_df.to_csv("../../ext_kw_data.csv", index=False)
+ext_kw_df.to_csv("../../../eckstein-keane-wolpin-extended.csv", index=False,  sep="\t")
 
 # create and save replication of original KW97 data set
 cond = df["AGE"].ge(16) & df["SURVEY_YEAR"].le(1987)
@@ -524,4 +524,4 @@ kw_df.rename(
     },
     inplace=True,
 )
-kw_df.to_csv("../../kw_data.csv", index=False)
+kw_df.to_csv("../../../eckstein-keane-wolpin.csv", index=False,  sep="\t")
