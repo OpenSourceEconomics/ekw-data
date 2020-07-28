@@ -30,7 +30,9 @@ df.loc[cond, 'AGE_OCT'] = df.loc[cond, 'AGE_OCT'] - 1
 # (<=> 'SURVEY_YEAR' - 'AGE_OCT' >= 1961)
 cond = df['SURVEY_YEAR'] - df['AGE_OCT'] >= 1961
 df = df.loc[cond]
-len(df['IDENTIFIER'].unique())
+
+cond = df["IDENTIFIER"] < 100
+df = df.loc[cond]
 
 #
 id_list = df['IDENTIFIER'].unique()
