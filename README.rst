@@ -28,7 +28,7 @@ We provide the original data set used by Keane & Wolpin (1997) in their seminal 
 .. image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/OpenSourceEconomics/ekw-data/blob/master/career-decisions/exploration.ipynb/master
 
-.. image:: https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.png
+.. image:: https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg
    :target: https://mybinder.org/v2/gh/OpenSourceEconomics/ekw-data/blob/master/career-decisions/exploration.ipynb/master
 
 Eckstein-Keane-Wolpin data
