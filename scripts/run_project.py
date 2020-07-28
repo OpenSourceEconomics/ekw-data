@@ -18,7 +18,7 @@ def run_notebook(notebook):
 
 # We want to make sure all notebooks run.
 os.chdir(PROJECT_ROOT)
-for dirname in ["career-decisions"]:
+for dirname in ["career-decisions", "eckstein-keane-wolpin"]:
     os.chdir(dirname)
     run_notebook("exploration.ipynb")
     os.chdir(PROJECT_ROOT)
@@ -31,5 +31,5 @@ for dirname in ["career-decisions"]:
         sp.check_call(["python", fname])
     os.chdir(PROJECT_ROOT)
 
-os.chdir("eckstein-keane-wolpin")
+os.chdir("eckstein-keane-wolpin/material")
 sp.check_call(["python", "create.py"])
