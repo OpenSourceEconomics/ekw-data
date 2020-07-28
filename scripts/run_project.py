@@ -30,3 +30,6 @@ for dirname in ["career-decisions"]:
     for fname in glob.glob("*.py"):
         sp.check_call(["python", fname])
     os.chdir(PROJECT_ROOT)
+
+os.chdir("eckstein-keane-wolpin")
+sp.check_call(["python", "create.py"])
