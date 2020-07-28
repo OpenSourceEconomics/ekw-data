@@ -29,7 +29,7 @@ We provide the original data set used by Keane & Wolpin (1997) in their seminal 
    :target: https://mybinder.org/v2/gh/OpenSourceEconomics/ekw-data/blob/master/career-decisions/exploration.ipynb/master
 
 .. image:: https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg
-   :target: https://mybinder.org/v2/gh/OpenSourceEconomics/ekw-data/blob/master/career-decisions/exploration.ipynb/master
+   :target: https://nbviewer.jupyter.org/github/OpenSourceEconomics/ekw-data/blob/master/career-decisions/exploration.ipynb
 
 Eckstein-Keane-Wolpin data
 --------------------------
@@ -38,6 +38,10 @@ We provide a cleaned version of the `National Longitudinal Survey of Youth 1979 
 
 .. image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/OpenSourceEconomics/ekw-data/blob/master/eckstein-keane-wolpin/exploration.ipynb/master
+
+.. image:: https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg
+   :target: https://nbviewer.jupyter.org/github/OpenSourceEconomics/ekw-data/blob/master/eckstein-keane-wolpin/exploration.ipynb
+
 
 References
 ----------
