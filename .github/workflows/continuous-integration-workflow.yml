@@ -21,7 +21,7 @@ jobs:
         export PATH="$PATH:/usr/share/miniconda/bin"
         source .envrc
 
-        run-project
+        #run-project
         py.test
 
     - name: check notebook formatting
