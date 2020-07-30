@@ -352,3 +352,23 @@ labels = ["blue_collar", "white_collar", "military", "schooling", "home"]
 
 
 if __name__ == "__main__":
+    from career_decisions_analysis import get_prepare_career_decisions_data
+    from career_decisions_analysis import get_working_experience
+    from career_decisions_analysis import get_initial_schooling
+    from career_decisions_analysis import make_transition_matrix
+
+    df = get_prepare_career_decisions_data("../career-decisions.raw")
+    df = df.groupby("Identifier").apply(lambda x: get_working_experience(x))
+
+    for coloring in ["color", "bw"]:
+
+        plot_sample_size(df, coloring)
+
+        plot_decisions_by_age(df, coloring)
+
+        plot_wage_moments(df, savgol=True, color=coloring)
+        plot_wage_moments(df, savgol=False, color=coloring)
+
+        plot_initial_schooling(get_initial_schooling(df)[1], coloring)
+
+        plot_transition_heatmap(make_transition_matrix(df), "origin_to_destination", coloring)
