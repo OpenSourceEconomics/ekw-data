@@ -12,6 +12,7 @@ import matplotlib.colors as mc
 from scipy.signal import savgol_filter
 
 SAVEPATH = os.environ["PROJECT_ROOT"] + "/career-decisions/material"
+RAW_DATA = os.environ["PROJECT_ROOT"] + "/career-decisions/career-decisions.raw"
 
 
 def make_grayscale_cmap(cmap):
@@ -102,7 +103,7 @@ def plot_sample_size(df, color="color"):
     ax.yaxis.set_major_formatter(mtick.StrMethodFormatter("{x:,.0f}"))
     ax.set_ylabel("Individuals")
 
-    fig.savefig(f"{SAVEPATH}/fig_sample_size{color_scheme[color]['extension']}.pdf")
+    fig.savefig(f"{SAVEPATH}/fig-sample-size{color_scheme[color]['extension']}.pdf")
 
 
 def plot_decisions_by_age(df, color="color"):
@@ -146,7 +147,7 @@ def plot_decisions_by_age(df, color="color"):
         ncol=5,
     )
 
-    fig.savefig(f"{SAVEPATH}/fig_observed_data_choices{color_scheme[color]['extension']}.pdf")
+    fig.savefig(f"{SAVEPATH}/fig-observed-data_choices{color_scheme[color]['extension']}.pdf")
 
 
 def plot_wage_moments(df, savgol=False, color="color"):
@@ -208,7 +209,7 @@ def plot_wage_moments(df, savgol=False, color="color"):
             # Application of savgol_filter
             if savgol:
                 y = list(savgol_filter(sufficient_wage_moments, 7, 3))
-                ext_sg = "_savgol"
+                ext_sg = "-savgol"
             else:
                 y = sufficient_wage_moments
                 ext_sg = ""
@@ -241,7 +242,7 @@ def plot_wage_moments(df, savgol=False, color="color"):
         fig.tight_layout()
 
         fig.savefig(
-            f"{SAVEPATH}/fig_observed_wage_{moment}{ext_sg}{color_scheme[color]['extension']}.pdf"
+            f"{SAVEPATH}/fig-observed-wage-{moment}{ext_sg}{color_scheme[color]['extension']}.pdf"
         )
 
 
@@ -275,7 +276,7 @@ def plot_initial_schooling(initial_schooling, color="color"):
     ax.set_ylabel("Share of Individuals")
     ax.yaxis.get_major_ticks()[0].set_visible(False)
 
-    fig.savefig(f"{SAVEPATH}/fig_initial_schooling{color_scheme[color]['extension']}.pdf")
+    fig.savefig(f"{SAVEPATH}/fig-initial-schooling{color_scheme[color]['extension']}.pdf")
 
 
 def plot_transition_heatmap(tm, transition_direction="origin_to_destination", color="color"):
@@ -308,7 +309,7 @@ def plot_transition_heatmap(tm, transition_direction="origin_to_destination", co
         ext = ""
     if color == "bw":
         _cmap = make_grayscale_cmap("Blues")
-        ext = "_bw"
+        ext = "-bw"
 
     sns.heatmap(
         tm,
@@ -325,9 +326,10 @@ def plot_transition_heatmap(tm, transition_direction="origin_to_destination", co
     plt.ylabel("Choice $t$", labelpad=10)
     plt.xlabel("Choice $t+1$", labelpad=10)
 
-    fig.savefig(f"{SAVEPATH}/fig_heatmap_transitionprobs{ext}.pdf")
+    fig.savefig(f"{SAVEPATH}/fig-heatmap-transitionprobs{ext}.pdf")
 
 
+# Definition of color schemes (Tableau 10 and grayscale based on copper)
 _cmap = make_grayscale_cmap("copper")
 color_scheme = {
     "bw": {
@@ -336,7 +338,7 @@ color_scheme = {
         "military": _cmap(0.51),
         "school": _cmap(0.93),
         "home": _cmap(0.76),
-        "extension": "_bw",
+        "extension": "-bw",
     },
     "color": {
         "blue_collar": "tab:blue",
@@ -347,17 +349,18 @@ color_scheme = {
         "extension": "",
     },
 }
-
+# Ordering OSE convention: blue-collar, white-collar, military, school, home
 labels = ["blue_collar", "white_collar", "military", "schooling", "home"]
 
 
+# Stand-alone creation of figures
 if __name__ == "__main__":
     from career_decisions_analysis import get_prepare_career_decisions_data
     from career_decisions_analysis import get_working_experience
     from career_decisions_analysis import get_initial_schooling
     from career_decisions_analysis import make_transition_matrix
 
-    df = get_prepare_career_decisions_data("../career-decisions.raw")
+    df = get_prepare_career_decisions_data(RAW_DATA)
     df = df.groupby("Identifier").apply(lambda x: get_working_experience(x))
 
     for coloring in ["color", "bw"]:
