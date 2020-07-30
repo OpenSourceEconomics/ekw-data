@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 """
 """
+import os
 
-import preliminary_data_adjustments  # noqa: F401
-
-# import get_occ_codes_kw97  # noqa: F401
-import extended_kw97_dataclean  # noqa: F401
-import testing  # noqa: F401
+for file in [
+    "xwalk_with_categories",
+    "preliminary_data_adjustments",
+    "extended_kw97_dataclean",
+    "testing",
+]:
+    os.system("python " + file + ".py")

@@ -4,10 +4,11 @@ the wide format.
 """
 import os
 from pathlib import Path
-
-import create_large_files  # noqa: F401
-import process_original_csv  # noqa: F401
 from clsSource import SourceCls
+
+for file in ["create_large_files", "process_original_csv"]:
+    os.system("python " + file + ".py")
+
 
 PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
