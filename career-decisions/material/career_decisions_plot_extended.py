@@ -149,7 +149,7 @@ def plot_decisions_by_age(df, color="color"):
     fig.savefig(f"./fig_observed_data_choices{color_scheme[color]['extension']}.pdf")
 
 
-def plot_wage_moments(df, color="color", savgol=False):
+def plot_wage_moments(df, savgol=False, color="color"):
     """Plot mean and std of observed wages in blue, white, and military.
 
     Parameters:
@@ -269,7 +269,7 @@ def plot_initial_schooling(initial_schooling, color="color"):
 
     """
 
-    fig, ax = plt.subplots(1, 1)
+    fig, ax = plt.subplots()
     ax.bar(
         initial_schooling["years"],
         initial_schooling["frequency"],
@@ -286,7 +286,7 @@ def plot_initial_schooling(initial_schooling, color="color"):
     fig.savefig(f"./fig_initial_schooling{color_scheme[color]['extension']}.pdf")
 
 
-def plot_transition_heatmap(tm, transition_direction="origin_to_destination"):
+def plot_transition_heatmap(tm, transition_direction="origin_to_destination", color="color"):
     """Illustration of transition probability (od and do) in a heatmap.
 
     Parameters:
@@ -309,11 +309,15 @@ def plot_transition_heatmap(tm, transition_direction="origin_to_destination"):
     tm = tm[transition_direction]
     tm = tm.reindex(label_order[::-1])
 
-    fig, ax = plt.subplots(figsize=(7, 5.2))
+    fig, ax = plt.subplots()
+
+    _cmap = "Blues"
+    if color == "bw":
+        _cmap = make_grayscale_cmap("Blues")
 
     sns.heatmap(
         tm,
-        cmap="Blues",
+        cmap=_cmap,
         annot=True,
         vmin=0,
         vmax=0.75,
