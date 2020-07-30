@@ -194,7 +194,7 @@ def plot_wage_moments(df, savgol=False, color="color"):
             moment_label = "Average"
         if moment == "std":
             color_scale = 0.6
-            moment_label = "Standard deviation"
+            moment_label = "SD"
 
         for wc in wage_categories:
 
