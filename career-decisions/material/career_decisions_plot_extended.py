@@ -13,6 +13,7 @@ from scipy.signal import savgol_filter
 
 # Set colors for occupations
 
+
 def make_grayscale_cmap(cmap):
     """Return a grayscale version of given colormap.
 
@@ -92,7 +93,7 @@ def plot_sample_size(df, color="color"):
     x = df["Age"].unique()
 
     fig, ax = plt.subplots()
-    ax.bar(x, y, 0.9, color = color_scheme[color]['blue_collar'])
+    ax.bar(x, y, 0.9, color=color_scheme[color]["blue_collar"])
 
     plt.xticks(list(df.Age[:].unique()))
     ax.set_xlabel("Age")
@@ -101,21 +102,7 @@ def plot_sample_size(df, color="color"):
     ax.yaxis.set_major_formatter(mtick.StrMethodFormatter("{x:,.0f}"))
     ax.set_ylabel("Individuals")
 
-    fig.savefig(
-        f"./fig_sample_size{color_scheme[color]['extension']}.pdf"
-    )
-
-
-def plot_initial_schooling(initial_schooling):
-
-    fig, ax = plt.subplots(1, 1)
-    ax.bar(initial_schooling["years"], initial_schooling["frequency"], 0.8)
-
-    ax.set_xlabel("Initial Schooling Level")
-
-    ax.set_ylim([0, 1])
-    ax.set_ylabel("Share of Individuals")
-    ax.yaxis.get_major_ticks()[0].set_visible(False)
+    fig.savefig(f"./fig_sample_size{color_scheme[color]['extension']}.pdf")
 
 
 def plot_decisions_by_age(df, color="color"):
@@ -137,7 +124,7 @@ def plot_decisions_by_age(df, color="color"):
 
     """
 
-    #labels = ["blue_collar", "white_collar", "military", "schooling", "home"]
+    # labels = ["blue_collar", "white_collar", "military", "schooling", "home"]
 
     fig, ax = plt.subplots()
 
@@ -159,9 +146,7 @@ def plot_decisions_by_age(df, color="color"):
         ncol=5,
     )
 
-    fig.savefig(
-        f"./fig_observed_data_choices{color_scheme[color]['extension']}.pdf"
-    )
+    fig.savefig(f"./fig_observed_data_choices{color_scheme[color]['extension']}.pdf")
 
 
 def plot_wage_moments(df, color="color", savgol=False):
@@ -178,6 +163,11 @@ def plot_wage_moments(df, color="color", savgol=False):
 
     savgol: Boolean
         Switch for application of Savitzky-Golay Filtering.
+
+    Returns:
+    --------
+    savefig: pdf
+        Figure saved as pdf file.
 
     References:
     -----------
@@ -262,21 +252,56 @@ def plot_wage_moments(df, color="color", savgol=False):
             f"./fig_observed_wage_{moment}{ext_savgol}{color_scheme[color]['extension']}.pdf"
         )
 
+
+def plot_initial_schooling(initial_schooling, color="color"):
+    """Illustration of initial schooling frequency.
+
+    Parameters:
+    -----------
+    initial_schooling: dict
+        Dictionary that contains key: value pairs of schooling information
+        years, number, and frequency.
+
+    Returns:
+    --------
+    savefig: pdf
+        Figure saved as pdf file.
+
+    """
+
+    fig, ax = plt.subplots(1, 1)
+    ax.bar(
+        initial_schooling["years"],
+        initial_schooling["frequency"],
+        0.8,
+        color=color_scheme[color]["blue_collar"],
+    )
+
+    ax.set_xlabel("Initial Schooling Level")
+
+    ax.set_ylim([0, 1])
+    ax.set_ylabel("Share of Individuals")
+    ax.yaxis.get_major_ticks()[0].set_visible(False)
+
+    fig.savefig(f"./fig_initial_schooling{color_scheme[color]['extension']}.pdf")
+
+
 def plot_transition_heatmap(tm, transition_direction="origin_to_destination"):
     """Illustration of transition probability (od and do) in a heatmap.
 
     Parameters:
     -----------
-        tm: dictionary
-            Dictionary of transition matrices for both directions.
+    tm: dictionary
+        Dictionary of transition matrices for both directions.
 
-        transition_direction: str
-            Direction for which the heatmap should be plotted (for subsetting purpose).
+    transition_direction: str
+        Direction for which the heatmap should be plotted (for subsetting purpose).
 
 
     Returns:
     -------
-        plt.savefig
+    savefig: pdf
+        Figure saved as pdf file.
 
     """
     label_order = ["blue_collar", "white_collar", "military", "schooling", "home"]
@@ -300,7 +325,6 @@ def plot_transition_heatmap(tm, transition_direction="origin_to_destination"):
     plt.yticks(rotation=0)
     plt.ylabel("Choice $t$", labelpad=10)
     plt.xlabel("Choice $t+1$", labelpad=10)
-
 
 
 _cmap = make_grayscale_cmap("copper")
