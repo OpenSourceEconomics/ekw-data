@@ -79,7 +79,7 @@ def plot_sample_size(df, color="color"):
 
     color: str
         Switch for colored (color = "color")
-            or black-white (color = "bw") version..
+            or black-white (color = "bw") version.
 
     Returns:
     --------
@@ -163,7 +163,8 @@ def plot_decisions_by_age(df, color="color"):
         f"./fig_observed_data_choices{color_scheme[color]['extension']}.pdf"
     )
 
-def plot_wage_moments(df, savgol=False):
+
+def plot_wage_moments(df, color="color", savgol=False):
     """Plot mean and std of observed wages in blue, white, and military.
 
     Parameters:
@@ -171,8 +172,12 @@ def plot_wage_moments(df, savgol=False):
     df: pd.DataFrame
         Dataframe consisting of sample data.
 
+    color: str
+        Switch for colored (color = "color")
+            or black-white (color = "bw") version.
+
     savgol: Boolean
-        Application of Savitzky Golay Filtering.
+        Switch for application of Savitzky-Golay Filtering.
 
     References:
     -----------
@@ -187,22 +192,30 @@ def plot_wage_moments(df, savgol=False):
 
     minimum_observations = 10
     wage_categories = ["blue_collar", "white_collar", "military"]
-    wage_colors = {"blue_collar": "tab:blue", "white_collar": "tab:red", "military": "tab:purple"}
+    # wage_colors = {"blue_collar": "tab:blue", "white_collar": "tab:red", "military": "tab:purple"}
+
+    # moment_settings = {
+    #     "mean": {"color_scale": 1,
+    #              "label_moment": "Average"},
+    #     "std": {"color_scale": 0.6,
+    #             "label_moments": "Standard deviation"},
+    #     }
 
     wage_moments = df.groupby(["Age", "Choice"])["Wage"].describe()[["mean", "std"]].unstack()
 
     for moment in ["mean", "std"]:
-        fig, ax = plt.subplots(figsize=(6, 4.5))
+        fig, ax = plt.subplots()
 
         if moment == "mean":
             color_scale = 1
-            label_moment = "Average"
+            moment_label = "Average"
         if moment == "std":
             color_scale = 0.6
-            label_moment = "Standard deviation"
+            moment_label = "Standard deviation"
 
         for wc in wage_categories:
 
+            # Exlude wage categories with less than `minimum_observations` observations
             sufficient_boolean = list(
                 *[df.groupby(["Age"]).Choice.value_counts().unstack()[wc] >= minimum_observations]
             )
@@ -210,10 +223,13 @@ def plot_wage_moments(df, savgol=False):
             _wage_moments = list(wage_moments[moment][wc])
             sufficient_wage_moments = list(compress(_wage_moments, sufficient_boolean))
 
+            # Application of savgol_filter
             if savgol:
                 y = list(savgol_filter(sufficient_wage_moments, 7, 3))
+                ext_savgol = "_savgol"
             else:
                 y = sufficient_wage_moments
+                ext_savgol = ""
 
             for i, insertion in enumerate(non_sufficient_index):
                 y.insert(insertion + i, np.nan)
@@ -222,7 +238,7 @@ def plot_wage_moments(df, savgol=False):
             y_plot.index = list(wage_moments[moment].index)
 
             ax.plot(
-                y_plot, color=make_color_lighter(wage_colors[wc], color_scale), label=wc,
+                y_plot, color=make_color_lighter(color_scheme[color][wc], color_scale), label=wc,
             )
 
         ax.legend(
@@ -235,13 +251,16 @@ def plot_wage_moments(df, savgol=False):
         ax.set_xticks(df["Age"].unique())
         ax.set_xlabel("Age")
 
-        ax.set_ylabel(f"{label_moment} wage (in $ 1,000)", labelpad=20)
+        ax.set_ylabel(f"{moment_label} wage (in $ 1,000)", labelpad=20)
         ax.get_yaxis().set_major_formatter(
             plt.FuncFormatter(lambda x, loc: "{0:0,}".format(int(x / 1000)))
         )
 
         fig.tight_layout()
 
+        fig.savefig(
+            f"./fig_observed_wage_{moment}{ext_savgol}{color_scheme[color]['extension']}.pdf"
+        )
 
 def plot_transition_heatmap(tm, transition_direction="origin_to_destination"):
     """Illustration of transition probability (od and do) in a heatmap.
@@ -287,8 +306,8 @@ def plot_transition_heatmap(tm, transition_direction="origin_to_destination"):
 _cmap = make_grayscale_cmap("copper")
 color_scheme = {
     "bw": {
-        "blue_collar": _cmap(0.28),
-        "white_collar": _cmap(0.18),
+        "blue_collar": _cmap(0.29),
+        "white_collar": _cmap(0.16),
         "military": _cmap(0.51),
         "school": _cmap(0.93),
         "home": _cmap(0.76),
