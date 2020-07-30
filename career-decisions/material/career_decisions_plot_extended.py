@@ -1,14 +1,14 @@
 """Figures for career decisions data."""
 import os
+import colorsys
 
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
 import seaborn as sns
 import numpy as np
 import pandas as pd
-from itertools import compress
-import colorsys
 import matplotlib.colors as mc
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
+from itertools import compress
 from scipy.signal import savgol_filter
 
 SAVEPATH = os.environ["PROJECT_ROOT"] + "/career-decisions/material"
