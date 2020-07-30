@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# coding: utf-8
+"""This module creates the choice, wage and schooling variables and truncates observations
+according to Footnote 15 in KW97 """
 
 from pathlib import Path
 import os
@@ -344,7 +344,7 @@ df["INCOME_RAW"] = df["INCOME"].copy()
 cond = df["INCOME"] > (df["INCOME"].mean() + 3 * df["INCOME"].std())
 df.loc[cond, "INCOME"] = np.nan
 
-# Table 13
+# We construct the covariates that are used in Table 13
 cond = df["NUMBER_OF_SIBLINGS"].gt(4)
 df.loc[cond, "NUMBER_OF_SIBLINGS"] = 4
 
@@ -402,10 +402,12 @@ df["PARENTAL_INCOME_VERY_HIGH"] = 0
 cond = df["FAMILY_INCOME"].ge((2 * df["FAMILY_INCOME"].median())) & ~df["FAMILY_INCOME"].isna()
 df.loc[cond, "PARENTAL_INCOME_VERY_HIGH"] = 1
 
-# We restrict sample to years in which individuals were at least 16
+# We restrict the sample to years in which individuals were at least 15
 cond = df["AGE"] >= 15
 df = df.loc[cond]
 
+# We construct choices for ages 15 and 16 if they correspond to years 1976 or 1977 in which there
+# is no information on schooling and labor force status available
 df["aux_schooling"] = df["REAL_HIGHEST_GRADE_COMPLETED"].copy().shift(-1)
 
 cond = (
@@ -446,13 +448,12 @@ df.loc[cond_1 & cond_2, "REAL_HIGHEST_GRADE_COMPLETED"] = df.loc[cond_1 & cond_2
 cond = df["AGE"].eq(15) & df["CHOICE"].isin(["blue_collar", "white_collar", "military"])
 df.loc[cond, "CHOICE"] = "home"
 
-print(sum(df.loc[df["AGE"].eq(15), "REAL_HIGHEST_GRADE_COMPLETED"].isna()))
+df.drop(columns=["aux_schooling"], inplace=True)
+
 # truncate observations according to footnote 15 on p. 484,
-
-df["CONSECUTIVE_HIGHEST_GRADES_MISSING"] = 0
-
 # Create indicator variable for years which are the first of two consecutive years with missing
 # 'REAL_HIGHEST_GRADE_COMPLETED'
+df["CONSECUTIVE_HIGHEST_GRADES_MISSING"] = 0
 cond = (
     df["REAL_HIGHEST_GRADE_COMPLETED"].isna()
     & df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).isna()
@@ -476,6 +477,8 @@ df.loc[cond, "CUTOFF_WORK"] = 1
 df["CUTOFF_WORK"] = df.groupby("IDENTIFIER").CUTOFF_WORK.cumsum()
 df = df[df["CUTOFF_WORK"] == 0]
 
+# We create a variable which indicates the level of schooling an individual has obtained at a
+# given age
 df = df.groupby(df["IDENTIFIER"]).apply(lambda x: get_schooling_experience(x))
 
 # Delete all individuals for which baseline schooling (i. e. schooling at age 16) is less than 7
@@ -484,12 +487,12 @@ schooling_too_low = df.loc[cond, "IDENTIFIER"].unique()
 
 df.drop(index=schooling_too_low, level=0, inplace=True)
 
-# save data set
+# save data set with all variables, beginning at age 15
 df.to_pickle(
     PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/final/original_extended_final.pkl"
 )
 
-# create and save continuous data set
+# create and save continuous data set with all variables, beginning at age 15
 cond = df.loc[df["SURVEY_YEAR"].eq(2011), "CHOICE"].isin(
     ["schooling", "blue_collar", "white_collar", "military", "home"]
 )
@@ -502,7 +505,7 @@ cont_df.to_pickle(
     ".pkl"
 )
 
-# create and save extended replication of original KW97 data set
+# create and save extended replication of original KW97 data set, beginning at age 16
 cond = df["AGE"].ge(16)
 ext_kw_df = df.loc[cond, ["IDENTIFIER", "AGE", "SCHOOLING", "CHOICE", "INCOME"]]
 ext_kw_df.rename(
@@ -519,7 +522,7 @@ ext_kw_df.to_csv(
     PROJECT_DIR / "eckstein-keane-wolpin/eckstein-keane-wolpin-extended.csv", index=False, sep="\t"
 )
 
-# create and save replication of original KW97 data set
+# create and save replication of original KW97 data set, beginning at age 16
 cond = df["AGE"].ge(16) & df["SURVEY_YEAR"].le(1987)
 kw_df = df.loc[cond, ["IDENTIFIER", "AGE", "SCHOOLING", "CHOICE", "INCOME"]]
 kw_df.rename(

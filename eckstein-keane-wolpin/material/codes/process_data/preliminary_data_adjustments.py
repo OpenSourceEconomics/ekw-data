@@ -1,8 +1,5 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-"""This script performs some basic data operations based on KW97 and adjusts some special cases
-"""
+"""This script performs basic data requirements established in KW97 and directly adjusts special
+cases which cannot be implemented automatically. """
 
 import os
 from pathlib import Path
@@ -27,15 +24,15 @@ df = pd.read_pickle(
 cond = df["SAMPLE_ID"].isin([1, 2])
 df = df.loc[cond]
 
-# Construct variable 'AGE_OCT' that specifies the age of an individual on OCT, 1 of each survey year
-df["AGE_OCT"] = df["SURVEY_YEAR"] - df["YEAR_OF_BIRTH"]
+# Construct variable 'AGE' that specifies the age of an individual on OCT, 1 of each survey year
+df["AGE"] = df["SURVEY_YEAR"] - df["YEAR_OF_BIRTH"]
 
 cond = df.MONTH_OF_BIRTH > 9
-df.loc[cond, "AGE_OCT"] = df.loc[cond, "AGE_OCT"] - 1
+df.loc[cond, "AGE"] = df.loc[cond, "AGE"] - 1
 
 # Restrict sample to individuals who were age 16 or less on October 1, 1977
-# (<=> 'SURVEY_YEAR' - 'AGE_OCT' >= 1961)
-cond = df["SURVEY_YEAR"] - df["AGE_OCT"] >= 1961
+# (<=> 'SURVEY_YEAR' - 'AGE' >= 1961)
+cond = df["SURVEY_YEAR"] - df["AGE"] >= 1961
 df = df.loc[cond]
 len(df["IDENTIFIER"].unique())
 
@@ -48,19 +45,16 @@ age_df.rename(columns={0: "IDENTIFIER"}, inplace=True)
 age_df["AGE"] = np.tile(np.array(range(15, 51)), len(id_list))
 
 df = pd.merge(
-    df, age_df, how="outer", left_on=["IDENTIFIER", "AGE_OCT"], right_on=["IDENTIFIER", "AGE"]
+    df, age_df, how="outer", left_on=["IDENTIFIER", "AGE"], right_on=["IDENTIFIER", "AGE"]
 )
 
-df["Identifier"] = df["IDENTIFIER"]
-cond = df["AGE"].isna()
-df.loc[cond, "AGE"] = df.loc[cond, "AGE_OCT"]
 
 df = df.groupby(df["IDENTIFIER"]).apply(lambda x: extend_survey_year(x))
 df = df.groupby(df["IDENTIFIER"]).apply(lambda x: extend_table_13_covariates(x))
 
-df["Age"] = df["AGE"]
 df["SURVEY_YEAR"] = df["SURVEY_YEAR"].astype("Int64")
 df["Survey Year"] = df["SURVEY_YEAR"]
+df["Identifier"] = df["IDENTIFIER"]
 df.set_index(["Identifier", "Survey Year"], inplace=True)
 df.sort_values(by=["IDENTIFIER", "SURVEY_YEAR"], inplace=True)
 
@@ -140,7 +134,6 @@ cond = (df["IDENTIFIER"] == 376) & (df["AGE"] == 16)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 10
 
 # Identifier: 735
-# add explanation!!!
 cond = (df["IDENTIFIER"] == 735) & (df["AGE"] == 16)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 9
 
@@ -154,12 +147,10 @@ cond = (df["IDENTIFIER"] == 1679) & (df["AGE"] == 16)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 10
 
 # Identifier: 1743
-# add explanation!!!
 cond = (df["IDENTIFIER"] == 1743) & (df["AGE"] == 16)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 9
 
 # Identifier: 2182
-# add explanation!!!
 cond = (df["IDENTIFIER"] == 2182) & (df["AGE"] == 16)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 10
 
@@ -176,7 +167,7 @@ df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 10
 # 'REAL_HIGHEST_GRADE_COMPLETED' as of 10/1978(AGE 17): 11
 # BUT: received GED in 02/1979 and therefore seems to have not completed grade 12
 # as 'REAL_HIGHEST_GRADE_COMPLETED' at age 17 equals 11, REAL_HIGHEST_GRADE_COMPLETED' at age
-# 16 is set to 10 (see also extended_kw97_dataclean.ipynb )
+# 16 is set to 10
 cond = (df["IDENTIFIER"] == 2371) & (df["AGE"] == 16)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 10
 
@@ -184,7 +175,6 @@ cond = (df["IDENTIFIER"] == 2371) & (df["AGE"] == 17)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 11
 
 # Identifier: 2381
-# add explanation!!!
 cond = (df["IDENTIFIER"] == 2381) & (df["AGE"] == 16)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 10
 
@@ -192,7 +182,7 @@ cond = (df["IDENTIFIER"] == 2381) & (df["AGE"] == 17)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 11
 
 # Identifier: 4491
-# as there is no receive date for the GED, I follow KW with the baseline schooling at age 16
+# as there is no receiving date for the GED, I follow KW with the baseline schooling at age 16
 cond = (df["IDENTIFIER"] == 4491) & (df["AGE"] == 16)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 11
 
@@ -296,6 +286,7 @@ df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 16
 # ID 12106
 cond = (df["IDENTIFIER"] == 12106) & (df["AGE"] == 22)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 14
+
 
 # There are cases in which more than one grade was completed within one year.
 # Most of these cases are corrected/smoothed in the following.
@@ -442,7 +433,7 @@ df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = df.loc[cond, "REAL_HIGHEST_GRADE_
 
 # ID 2135 fine as is
 
-# ID 2261 possibly drop
+# ID 2261
 cond = (df["IDENTIFIER"] == 2261) & (df["AGE"] == 23)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 8
 
@@ -471,8 +462,6 @@ df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 14
 
 cond = (df["IDENTIFIER"] == 2545) & (df["AGE"] == 32)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 15
-
-# ID 2582 drop
 
 # ID 2589
 cond = (df["IDENTIFIER"] == 2589) & (df["AGE"] == 24)
@@ -666,7 +655,7 @@ df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 13
 cond = (df["IDENTIFIER"] == 5168) & (df["AGE"] == 28)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 16
 
-# ID 5177 fine as is, but quite weird
+# ID 5177 fine as is
 
 # ID 5184
 cond = (df["IDENTIFIER"] == 5184) & (df["AGE"] == 16)
@@ -787,7 +776,7 @@ df.loc[~cond_1 & cond_2 & cond_3, "REAL_HIGHEST_GRADE_COMPLETED"] = df.loc[
     ~cond_1 & cond_2, "AUX_HGC"
 ]
 
-df.drop(columns=["AUX_HGC"])
+df.drop(columns=["AUX_HGC"], inplace=True)
 
 df["AUX_HGC"] = df["REAL_HIGHEST_GRADE_COMPLETED"].copy()
 
@@ -801,7 +790,7 @@ cond_1 = ~(df["REAL_HIGHEST_GRADE_COMPLETED"].diff().shift(-1).isin([0.0, 1.0]))
 cond_2 = df["AUX_HGC"].isna()
 df.loc[cond_1 & cond_2, "REAL_HIGHEST_GRADE_COMPLETED"] = np.nan
 
-df.drop(columns=["AUX_HGC"])
+df.drop(columns=["AUX_HGC"], inplace=True)
 
 # correct 'REAL_HIGHEST_GRADE_COMPLETED' if degree was obtained between October and May
 

@@ -1,3 +1,7 @@
+"""This module creates original_extended.csv from original.csv and several other csv-files with
+additional covariates.
+"""
+
 import os
 import shutil
 from pathlib import Path
@@ -10,6 +14,7 @@ original_ext_df = pd.read_csv(
     PROJECT_DIR / "eckstein-keane-wolpin/material/sources/original.csv", index_col="R0000100"
 )
 
+# create short description file (sdf) which are is later to create variables
 shutil.copyfile(
     PROJECT_DIR / "eckstein-keane-wolpin/material/sources/original.sdf",
     PROJECT_DIR / "sources/original_extended.sdf",
@@ -26,6 +31,7 @@ with open(
 ) as file:
     file.write(filedata)
 
+# create original_extended.csv by merging other csv-files
 for filename in [
     "unrevised_educ_vars",
     "additional_educ_vars",
