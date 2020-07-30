@@ -95,7 +95,8 @@ class SourceCls(object):
         # Read from original data from CSV file
         self.source_wide = pd.read_csv(
             PROJECT_DIR / "eckstein-keane-wolpin/material/sources/original_extended.csv",
-            nrows=num_agents)
+            nrows=num_agents,
+        )
 
         # Process variable dictionary
         survey_years, dct = get_mappings()

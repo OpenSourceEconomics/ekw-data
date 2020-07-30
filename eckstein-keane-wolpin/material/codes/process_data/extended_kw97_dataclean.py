@@ -34,7 +34,8 @@ df.loc[cond, "GRADE_COMPLETED"] = 0
 # Merge the dataframe with the disentangled information on weekly jobs (occupation codes)
 # and wages from get_occ_codes_kw97.py
 job_choice_df = pd.read_pickle(
-    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/interim/jobs_with_occ_codes.pkl")
+    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/interim/jobs_with_occ_codes.pkl"
+)
 job_choice_df.index.rename(["Identifier", "Survey Year"], inplace=True)
 
 df = df.join(job_choice_df, rsuffix="_y")
@@ -48,9 +49,9 @@ df["CHOICE"] = np.nan
 # Condition 1: "An individual ist considered to have attended school
 # during the year if the individual attended in any of the three weeks..."
 school_cond_1 = (
-        df["ENROLLED_SCHOOL_APRIL"].shift(-1).eq(1.0)
-        | df["ENROLLED_SCHOOL_JANUARY"].shift(-1).eq(1.0)
-        | df["ENROLLED_SCHOOL_OCTOBER"].eq(1.0)
+    df["ENROLLED_SCHOOL_APRIL"].shift(-1).eq(1.0)
+    | df["ENROLLED_SCHOOL_JANUARY"].shift(-1).eq(1.0)
+    | df["ENROLLED_SCHOOL_OCTOBER"].eq(1.0)
 )
 
 # Condition 2: "... and the individual reported completing one grade level by October 1
@@ -60,9 +61,9 @@ school_cond_2 = df["GRADE_COMPLETED"].ge(1.0)  # 'GRADE_COMPLETED' might be larg
 # Create variable which counts the number of attendance data points [October 1, January 1, April 1]
 # non-missing in a given year
 df["SCHOOL_NONMISSING_MONTHS"] = (
-        (~(df["ENROLLED_SCHOOL_OCTOBER"].isna())).astype(int)
-        + (~(df["ENROLLED_SCHOOL_JANUARY"].shift(-1).isna())).astype(int)
-        + (~(df["ENROLLED_SCHOOL_APRIL"].shift(-1).isna())).astype(int)
+    (~(df["ENROLLED_SCHOOL_OCTOBER"].isna())).astype(int)
+    + (~(df["ENROLLED_SCHOOL_JANUARY"].shift(-1).isna())).astype(int)
+    + (~(df["ENROLLED_SCHOOL_APRIL"].shift(-1).isna())).astype(int)
 )
 
 # Condition 3: All 3 attendance data points are non-missing
@@ -116,12 +117,12 @@ df.loc[work_cond_1 & ~work_cond_2 & work_cond_3 & work_cond_4, "CHOICE"] = "Pote
 # merge it with our previous data
 gnp_deflation = pd.read_csv(
     PROJECT_DIR / "eckstein-keane-wolpin/material/sources/gnp_deflator_data/st_louis_fed_deflator"
-                  ".csv",
-    index_col="SURVEY_YEAR"
+    ".csv",
+    index_col="SURVEY_YEAR",
 )
 
 gnp_deflation["GNP_DEFL_BASE_1987"] = (
-        gnp_deflation["IMPLICIT_GNP"] / gnp_deflation.loc[1987, "IMPLICIT_GNP"]
+    gnp_deflation["IMPLICIT_GNP"] / gnp_deflation.loc[1987, "IMPLICIT_GNP"]
 )
 
 df = df.merge(gnp_deflation, left_on="SURVEY_YEAR", right_index=True, how="outer")
@@ -133,7 +134,8 @@ df.sort_values(by=["IDENTIFIER", "SURVEY_YEAR"], inplace=True)
 
 # Read in csv-file
 categories_df = pd.read_pickle(
-    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/interim/categorized_xwalk.pkl")
+    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/interim/categorized_xwalk.pkl"
+)
 
 categories_df.columns = [
     "OCC1990",
@@ -295,8 +297,7 @@ df["HOME_CHOICE"] = np.nan
 # An individual who stays home and did not work for more than 1/3 of the non-missing weeks
 # (i. e. did not satisfy work_cond_1), are assigned to 'non_working'
 cond = df["CHOICE"].eq("home") & (
-        (df["UNEMPLOYED"] + df["OUT_OF_LABOR_FORCE"] + df["NOT_WORKING"]) / df[
-         "EMP_NONMISSING_WEEKS"]
+    (df["UNEMPLOYED"] + df["OUT_OF_LABOR_FORCE"] + df["NOT_WORKING"]) / df["EMP_NONMISSING_WEEKS"]
 ).gt(1 / 3)
 df.loc[cond, "HOME_CHOICE"] = "not_working"
 
@@ -408,18 +409,18 @@ df = df.loc[cond]
 df["aux_schooling"] = df["REAL_HIGHEST_GRADE_COMPLETED"].copy().shift(-1)
 
 cond = (
-        df["AGE"].eq(16)
-        & df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).ge(10)
-        & df["SURVEY_YEAR"].eq(1977)
+    df["AGE"].eq(16)
+    & df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).ge(10)
+    & df["SURVEY_YEAR"].eq(1977)
 )
 df.loc[cond, "CHOICE"] = df.loc[cond, "SPECIFIC_CHOICE"] = "schooling"
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = df.loc[cond, "aux_schooling"] - 1
 
 cond = (
-        df["AGE"].eq(16)
-        & df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).eq(9)
-        & df["SURVEY_YEAR"].eq(1977)
-        & df["CHOICE"].shift(-1).eq("schooling")
+    df["AGE"].eq(16)
+    & df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).eq(9)
+    & df["SURVEY_YEAR"].eq(1977)
+    & df["CHOICE"].shift(-1).eq("schooling")
 )
 df.loc[cond, "CHOICE"] = df.loc[cond, "SPECIFIC_CHOICE"] = "schooling"
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = df.loc[cond, "aux_schooling"] - 1
@@ -435,7 +436,7 @@ cond_1 = df["AGE"].eq(15) & df["SURVEY_YEAR"].isin([1976, 1977])
 cond_2 = df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).ge(9)
 df.loc[cond_1 & cond_2, "CHOICE"] = "schooling"
 df.loc[cond_1 & cond_2, "REAL_HIGHEST_GRADE_COMPLETED"] = (
-        df.loc[cond_1 & cond_2, "aux_schooling"] - 1
+    df.loc[cond_1 & cond_2, "aux_schooling"] - 1
 )
 
 cond_2 = df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).le(8)
@@ -453,9 +454,9 @@ df["CONSECUTIVE_HIGHEST_GRADES_MISSING"] = 0
 # Create indicator variable for years which are the first of two consecutive years with missing
 # 'REAL_HIGHEST_GRADE_COMPLETED'
 cond = (
-        df["REAL_HIGHEST_GRADE_COMPLETED"].isna()
-        & df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).isna()
-        & df["IDENTIFIER"].eq(df["IDENTIFIER"].shift(-1))
+    df["REAL_HIGHEST_GRADE_COMPLETED"].isna()
+    & df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).isna()
+    & df["IDENTIFIER"].eq(df["IDENTIFIER"].shift(-1))
 )
 df.loc[cond, "CONSECUTIVE_HIGHEST_GRADES_MISSING"] = 1
 
@@ -485,7 +486,8 @@ df.drop(index=schooling_too_low, level=0, inplace=True)
 
 # save data set
 df.to_pickle(
-    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/final/original_extended_final.pkl")
+    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/final/original_extended_final.pkl"
+)
 
 # create and save continuous data set
 cond = df.loc[df["SURVEY_YEAR"].eq(2011), "CHOICE"].isin(
@@ -497,7 +499,8 @@ cont_df = df[df["IDENTIFIER"].isin(continuous_list)]
 
 cont_df.to_pickle(
     PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/final/cont_original_extended_final"
-                  ".pkl")
+    ".pkl"
+)
 
 # create and save extended replication of original KW97 data set
 cond = df["AGE"].ge(16)
@@ -512,8 +515,9 @@ ext_kw_df.rename(
     },
     inplace=True,
 )
-ext_kw_df.to_csv(PROJECT_DIR / "eckstein-keane-wolpin/eckstein-keane-wolpin-extended.csv",
-                 index=False, sep="\t")
+ext_kw_df.to_csv(
+    PROJECT_DIR / "eckstein-keane-wolpin/eckstein-keane-wolpin-extended.csv", index=False, sep="\t"
+)
 
 # create and save replication of original KW97 data set
 cond = df["AGE"].ge(16) & df["SURVEY_YEAR"].le(1987)

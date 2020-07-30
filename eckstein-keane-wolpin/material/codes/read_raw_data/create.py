@@ -12,7 +12,7 @@ from clsSource import SourceCls
 PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
 if __name__ == "__main__":
-    fname = PROJECT_DIR/"eckstein-keane-wolpin/material/output/data/raw/original_extended.pkl"
+    fname = PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/raw/original_extended.pkl"
 
     source_obj = SourceCls()
 

@@ -13,7 +13,8 @@ import pandas as pd
 PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
 crosswalk = pd.read_excel(
-    PROJECT_DIR / "eckstein-keane-wolpin/material/sources/occ_crosswalks/occ1990_xwalk.xls")
+    PROJECT_DIR / "eckstein-keane-wolpin/material/sources/occ_crosswalks/occ1990_xwalk.xls"
+)
 crosswalk = crosswalk.iloc[:, [0, 1, 4, 7, 8]]
 crosswalk.columns = ["OCC1990", "DESCRIPTION", "CPS_1970", "CPS_2000_1", "CPS_2000_5"]
 # Delete headings in file
@@ -193,7 +194,7 @@ crosswalk["CATEGORY"][crosswalk["OCC1990"].isin(extended_military.values())] = "
 print(
     crosswalk[["OCC1990", "DESCRIPTION"]][
         crosswalk["CATEGORY"].isna() & ~crosswalk["OCC1990"].isin(occ_not_needed)
-        ]
+    ]
 )
 
 # Check of assigned categories with description manual for CPS_2000_1

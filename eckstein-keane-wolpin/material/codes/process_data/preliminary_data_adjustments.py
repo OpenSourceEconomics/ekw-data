@@ -20,7 +20,8 @@ PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
 # read in data
 df = pd.read_pickle(
-    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/raw/original_extended.pkl")
+    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/raw/original_extended.pkl"
+)
 
 # Restrict sample to white males from the core random sample, i. e. SAMPLE_ID equals 1 or 2
 cond = df["SAMPLE_ID"].isin([1, 2])
@@ -771,16 +772,16 @@ cond_1 = (df["MONTHS_ATTENDED_SCHOOL"].diff().shift(-1) <= 0) & (
     df["REAL_ENROLLMENT_STATUS"].shift(1).isin([2.0, 3.0])
 )
 cond_2 = (
-        ~(df["REAL_HIGHEST_GRADE_COMPLETED"].shift(1).isna())
-        & (df["REAL_HIGHEST_GRADE_COMPLETED"].isna())
-        & ~(df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).isna())
+    ~(df["REAL_HIGHEST_GRADE_COMPLETED"].shift(1).isna())
+    & (df["REAL_HIGHEST_GRADE_COMPLETED"].isna())
+    & ~(df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).isna())
 )
 cond_3 = (df["REAL_HIGHEST_GRADE_COMPLETED"].shift(1) + 1) == df[
     "REAL_HIGHEST_GRADE_COMPLETED"
 ].shift(-1)
 
 df.loc[cond_1 & cond_2 & cond_3, "REAL_HIGHEST_GRADE_COMPLETED"] = (
-        df.loc[cond_1 & cond_2, "AUX_HGC"] + 1
+    df.loc[cond_1 & cond_2, "AUX_HGC"] + 1
 )
 df.loc[~cond_1 & cond_2 & cond_3, "REAL_HIGHEST_GRADE_COMPLETED"] = df.loc[
     ~cond_1 & cond_2, "AUX_HGC"
