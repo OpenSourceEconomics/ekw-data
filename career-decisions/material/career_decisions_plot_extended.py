@@ -11,7 +11,7 @@ import colorsys
 import matplotlib.colors as mc
 from scipy.signal import savgol_filter
 
-savepath = os.environ["PROJECT_ROOT"] + "/career-decisions/material"
+SAVEPATH = os.environ["PROJECT_ROOT"] + "/career-decisions/material"
 
 
 def make_grayscale_cmap(cmap):
@@ -102,7 +102,7 @@ def plot_sample_size(df, color="color"):
     ax.yaxis.set_major_formatter(mtick.StrMethodFormatter("{x:,.0f}"))
     ax.set_ylabel("Individuals")
 
-    fig.savefig(f"{savepath}/fig_sample_size{color_scheme[color]['extension']}.pdf")
+    fig.savefig(f"{SAVEPATH}/fig_sample_size{color_scheme[color]['extension']}.pdf")
 
 
 def plot_decisions_by_age(df, color="color"):
@@ -146,7 +146,7 @@ def plot_decisions_by_age(df, color="color"):
         ncol=5,
     )
 
-    fig.savefig(f"{savepath}/fig_observed_data_choices{color_scheme[color]['extension']}.pdf")
+    fig.savefig(f"{SAVEPATH}/fig_observed_data_choices{color_scheme[color]['extension']}.pdf")
 
 
 def plot_wage_moments(df, savgol=False, color="color"):
@@ -182,14 +182,6 @@ def plot_wage_moments(df, savgol=False, color="color"):
 
     minimum_observations = 10
     wage_categories = ["blue_collar", "white_collar", "military"]
-    # wage_colors = {"blue_collar": "tab:blue", "white_collar": "tab:red", "military": "tab:purple"}
-
-    # moment_settings = {
-    #     "mean": {"color_scale": 1,
-    #              "label_moment": "Average"},
-    #     "std": {"color_scale": 0.6,
-    #             "label_moments": "Standard deviation"},
-    #     }
 
     wage_moments = df.groupby(["Age", "Choice"])["Wage"].describe()[["mean", "std"]].unstack()
 
@@ -249,7 +241,7 @@ def plot_wage_moments(df, savgol=False, color="color"):
         fig.tight_layout()
 
         fig.savefig(
-            f"{savepath}/fig_observed_wage_{moment}{ext_sg}{color_scheme[color]['extension']}.pdf"
+            f"{SAVEPATH}/fig_observed_wage_{moment}{ext_sg}{color_scheme[color]['extension']}.pdf"
         )
 
 
@@ -283,7 +275,7 @@ def plot_initial_schooling(initial_schooling, color="color"):
     ax.set_ylabel("Share of Individuals")
     ax.yaxis.get_major_ticks()[0].set_visible(False)
 
-    fig.savefig(f"{savepath}/fig_initial_schooling{color_scheme[color]['extension']}.pdf")
+    fig.savefig(f"{SAVEPATH}/fig_initial_schooling{color_scheme[color]['extension']}.pdf")
 
 
 def plot_transition_heatmap(tm, transition_direction="origin_to_destination", color="color"):
@@ -333,7 +325,7 @@ def plot_transition_heatmap(tm, transition_direction="origin_to_destination", co
     plt.ylabel("Choice $t$", labelpad=10)
     plt.xlabel("Choice $t+1$", labelpad=10)
 
-    fig.savefig(f"{savepath}/fig_heatmap_transitionprobs{ext}.pdf")
+    fig.savefig(f"{SAVEPATH}/fig_heatmap_transitionprobs{ext}.pdf")
 
 
 _cmap = make_grayscale_cmap("copper")
@@ -358,4 +350,5 @@ color_scheme = {
 
 labels = ["blue_collar", "white_collar", "military", "schooling", "home"]
 
-# if __name__ == "__main__":
+
+if __name__ == "__main__":
