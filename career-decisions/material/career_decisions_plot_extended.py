@@ -1,4 +1,5 @@
 """Figures for career decisions data."""
+import os
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
@@ -10,8 +11,7 @@ import colorsys
 import matplotlib.colors as mc
 from scipy.signal import savgol_filter
 
-
-# Set colors for occupations
+savepath = os.environ["PROJECT_ROOT"] + "/career-decisions/material"
 
 
 def make_grayscale_cmap(cmap):
@@ -102,7 +102,7 @@ def plot_sample_size(df, color="color"):
     ax.yaxis.set_major_formatter(mtick.StrMethodFormatter("{x:,.0f}"))
     ax.set_ylabel("Individuals")
 
-    fig.savefig(f"./fig_sample_size{color_scheme[color]['extension']}.pdf")
+    fig.savefig(f"{savepath}/fig_sample_size{color_scheme[color]['extension']}.pdf")
 
 
 def plot_decisions_by_age(df, color="color"):
@@ -146,7 +146,7 @@ def plot_decisions_by_age(df, color="color"):
         ncol=5,
     )
 
-    fig.savefig(f"./fig_observed_data_choices{color_scheme[color]['extension']}.pdf")
+    fig.savefig(f"{savepath}/fig_observed_data_choices{color_scheme[color]['extension']}.pdf")
 
 
 def plot_wage_moments(df, savgol=False, color="color"):
@@ -216,10 +216,10 @@ def plot_wage_moments(df, savgol=False, color="color"):
             # Application of savgol_filter
             if savgol:
                 y = list(savgol_filter(sufficient_wage_moments, 7, 3))
-                ext_savgol = "_savgol"
+                ext_sg = "_savgol"
             else:
                 y = sufficient_wage_moments
-                ext_savgol = ""
+                ext_sg = ""
 
             for i, insertion in enumerate(non_sufficient_index):
                 y.insert(insertion + i, np.nan)
@@ -249,7 +249,7 @@ def plot_wage_moments(df, savgol=False, color="color"):
         fig.tight_layout()
 
         fig.savefig(
-            f"./fig_observed_wage_{moment}{ext_savgol}{color_scheme[color]['extension']}.pdf"
+            f"{savepath}/fig_observed_wage_{moment}{ext_sg}{color_scheme[color]['extension']}.pdf"
         )
 
 
@@ -283,7 +283,7 @@ def plot_initial_schooling(initial_schooling, color="color"):
     ax.set_ylabel("Share of Individuals")
     ax.yaxis.get_major_ticks()[0].set_visible(False)
 
-    fig.savefig(f"./fig_initial_schooling{color_scheme[color]['extension']}.pdf")
+    fig.savefig(f"{savepath}/fig_initial_schooling{color_scheme[color]['extension']}.pdf")
 
 
 def plot_transition_heatmap(tm, transition_direction="origin_to_destination", color="color"):
@@ -311,9 +311,12 @@ def plot_transition_heatmap(tm, transition_direction="origin_to_destination", co
 
     fig, ax = plt.subplots()
 
-    _cmap = "Blues"
+    if color == "color":
+        _cmap = "Blues"
+        ext = ""
     if color == "bw":
         _cmap = make_grayscale_cmap("Blues")
+        ext = "_bw"
 
     sns.heatmap(
         tm,
@@ -329,6 +332,8 @@ def plot_transition_heatmap(tm, transition_direction="origin_to_destination", co
     plt.yticks(rotation=0)
     plt.ylabel("Choice $t$", labelpad=10)
     plt.xlabel("Choice $t+1$", labelpad=10)
+
+    fig.savefig(f"{savepath}/fig_heatmap_transitionprobs{ext}.pdf")
 
 
 _cmap = make_grayscale_cmap("copper")
