@@ -2,14 +2,17 @@
 """ This script constructs the panel dataset based on the NLSY sources from the website which are in
 the wide format.
 """
+import os
+from pathlib import Path
 
-from clsSource import SourceCls
 import create_large_files  # noqa: F401
 import process_original_csv  # noqa: F401
+from clsSource import SourceCls
+
+PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
 if __name__ == "__main__":
-
-    fname = "../../output/data/raw/original_extended.pkl"
+    fname = PROJECT_DIR/"eckstein-keane-wolpin/material/output/data/raw/original_extended.pkl"
 
     source_obj = SourceCls()
 

@@ -1,8 +1,9 @@
 """ This module processes the Short Description File to get the yearly variable names.
 """
-import pandas as pd
-import numpy as np
 import shlex
+
+import numpy as np
+import pandas as pd
 
 
 def get_mappings():

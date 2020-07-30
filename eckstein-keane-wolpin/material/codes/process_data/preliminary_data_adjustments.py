@@ -4,6 +4,9 @@
 """This script performs some basic data operations based on KW97 and adjusts some special cases
 """
 
+import os
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 from functions_prelim_adjust import adjust_hgc_12_for_ged
@@ -13,8 +16,11 @@ from functions_prelim_adjust import extend_table_13_covariates
 from functions_prelim_adjust import months_attended_school
 from functions_prelim_adjust import simple_two_grade_jump
 
+PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
+
 # read in data
-df = pd.read_pickle("../../output/data/raw/original_extended.pkl")
+df = pd.read_pickle(
+    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/raw/original_extended.pkl")
 
 # Restrict sample to white males from the core random sample, i. e. SAMPLE_ID equals 1 or 2
 cond = df["SAMPLE_ID"].isin([1, 2])
@@ -58,7 +64,6 @@ df.set_index(["Identifier", "Survey Year"], inplace=True)
 df.sort_values(by=["IDENTIFIER", "SURVEY_YEAR"], inplace=True)
 
 df = df.groupby(df["IDENTIFIER"]).apply(lambda x: extend_sample_id(x))
-
 
 # Gaps in the HGC variables and the 'highest grade attended' cannot decrease and gaps
 # in these variables can thus be potentially interpolated.
@@ -111,7 +116,6 @@ for num in range(1, 6):
     cond = (df["IDENTIFIER"] == 5585) & (df["JOB_" + repr(num)] == 26)
     df.loc[cond, "JOB_" + repr(num)] = 385
 
-
 # Changes to 'JOB_1' if the values in 'JOB_1' are not valid 1970 occupation codes and are equal
 # to CPSOCC70. The values are corrected with help of the CPSOCC80 variable in which the CPS job
 # of the year is coded in 1980 occupation codes
@@ -127,7 +131,6 @@ df.loc[cond, "JOB_1"] = 280
 # Typo in CPSOCC70 given that CPSOCC80 is the same for 706 and 709
 cond = (df["IDENTIFIER"] == 5306) & (df["JOB_1"] == 709)
 df.loc[cond, "JOB_1"] = 706
-
 
 # Identifier: 376
 # HIGHEST_GRADE_ATTENDED: 10, last month/year enrolled in school: 06/1977
@@ -198,7 +201,6 @@ df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 11
 # => 'REAL_HIGHEST_GRADE_COMPLETED' at age 16 (1977): 10, consistent with KW data
 cond = (df["IDENTIFIER"] == 5704) & (df["AGE"] == 16)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 10
-
 
 # For a small number of individuals, there are decreases in the HGC variable from
 # one year to the next, e. g. from 16 to 15 in the following year.
@@ -293,7 +295,6 @@ df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 16
 # ID 12106
 cond = (df["IDENTIFIER"] == 12106) & (df["AGE"] == 22)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 14
-
 
 # There are cases in which more than one grade was completed within one year.
 # Most of these cases are corrected/smoothed in the following.
@@ -770,16 +771,16 @@ cond_1 = (df["MONTHS_ATTENDED_SCHOOL"].diff().shift(-1) <= 0) & (
     df["REAL_ENROLLMENT_STATUS"].shift(1).isin([2.0, 3.0])
 )
 cond_2 = (
-    ~(df["REAL_HIGHEST_GRADE_COMPLETED"].shift(1).isna())
-    & (df["REAL_HIGHEST_GRADE_COMPLETED"].isna())
-    & ~(df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).isna())
+        ~(df["REAL_HIGHEST_GRADE_COMPLETED"].shift(1).isna())
+        & (df["REAL_HIGHEST_GRADE_COMPLETED"].isna())
+        & ~(df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).isna())
 )
 cond_3 = (df["REAL_HIGHEST_GRADE_COMPLETED"].shift(1) + 1) == df[
     "REAL_HIGHEST_GRADE_COMPLETED"
 ].shift(-1)
 
 df.loc[cond_1 & cond_2 & cond_3, "REAL_HIGHEST_GRADE_COMPLETED"] = (
-    df.loc[cond_1 & cond_2, "AUX_HGC"] + 1
+        df.loc[cond_1 & cond_2, "AUX_HGC"] + 1
 )
 df.loc[~cond_1 & cond_2 & cond_3, "REAL_HIGHEST_GRADE_COMPLETED"] = df.loc[
     ~cond_1 & cond_2, "AUX_HGC"
@@ -1184,4 +1185,6 @@ cond = df["IDENTIFIER"].eq(12069) & df["SURVEY_YEAR"].eq(1989)
 df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = 15
 
 # save the dataframe
-df.to_pickle("../../output/data/interim/original_extended_interim.pkl")
+df.to_pickle(
+    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/interim/original_extended_interim.pkl"
+)

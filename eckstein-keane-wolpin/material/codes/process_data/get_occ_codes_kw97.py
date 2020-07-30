@@ -4,30 +4,17 @@
 """This script translates the weekly labor force status into occupation codes
 """
 
+import os
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-
 from functions_prelim_adjust import data_shift
 
+PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
-df = pd.read_pickle("../../output/data/raw/original_extended.pkl")
-
-# Construct variable 'AGE_OCT' that specifies the age of an individual on OCT, 1 of each survey year
-df["AGE_OCT"] = df["SURVEY_YEAR"] - df["YEAR_OF_BIRTH"]
-cond = df.MONTH_OF_BIRTH > 9
-df.loc[cond, "AGE_OCT"] = df["AGE_OCT"] - 1
-
-
-# Restrict sample to white males from the core random sample, i. e. SAMPLE_ID equals 1 or 2
-cond = df["SAMPLE_ID"].isin([1, 2])
-df = df.loc[cond]
-
-
-# Restrict sample to individuals who were age 16 or less on October 1, 1977
-# (<=> 'SURVEY_YEAR' - 'AGE_OCT' >= 1961)
-cond = df["SURVEY_YEAR"] - df["AGE_OCT"] >= 1961
-df = df.loc[cond]
-
+df = pd.read_pickle(
+    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/raw/original_extended_interim.pkl")
 
 # construct a variable that displays which survey round took place in a given year
 # if there was any (, e. g. 1979 = survey round #1)
@@ -50,7 +37,6 @@ df.loc[cond, "SURVEY_ROUND"] = (((df["SURVEY_YEAR"] + 1) - 1994) / 2 + 16).astyp
 
 df["SURVEY_ROUND"] = pd.Series(df["SURVEY_ROUND"], dtype="Int64")
 
-
 # split the values in "EMP_STATUS_WK" into the relevant survey round (first digit/two digits)
 # and the relevant job number (last two digits)
 # based on the relevant survey round, determine the shift of the occjob_mod variables
@@ -63,38 +49,44 @@ for week_num in [1, 7, 13, 14, 20, 26, 40, 46, 52]:
 
     cond = df["EMP_STATUS_WK_" + repr(week_num)] >= 100
     df.loc[cond, "ROUND_JOBS_WK_" + repr(week_num)] = (
-        df.loc[cond, "EMP_STATUS_WK_" + repr(week_num)] / 100
+            df.loc[cond, "EMP_STATUS_WK_" + repr(week_num)] / 100
     ).astype(int)
     df.loc[cond, "JOB_NUMBER_WK_" + repr(week_num)] = (
-        df.loc[cond, "EMP_STATUS_WK_" + repr(week_num)] % 10
+            df.loc[cond, "EMP_STATUS_WK_" + repr(week_num)] % 10
     )
 
     df["REQUIRED_SHIFT_WK_" + repr(week_num)] = np.nan
 
     cond = (df["SURVEY_ROUND"] <= 16) & (df["ROUND_JOBS_WK_" + repr(week_num)] <= 16)
     df.loc[cond, "REQUIRED_SHIFT_WK_" + repr(week_num)] = (
-        df["ROUND_JOBS_WK_" + repr(week_num)] - df["SURVEY_ROUND"]
+            df["ROUND_JOBS_WK_" + repr(week_num)] - df["SURVEY_ROUND"]
     )
 
     cond = (df["SURVEY_ROUND"] <= 16) & (df["ROUND_JOBS_WK_" + repr(week_num)] > 16)
     df.loc[cond, "REQUIRED_SHIFT_WK_" + repr(week_num)] = (
-        df["ROUND_JOBS_WK_" + repr(week_num)] - 16
-    ) * 2 + (16 - df["SURVEY_ROUND"])
+                                                                  df["ROUND_JOBS_WK_" + repr(
+                                                                      week_num)] - 16
+                                                          ) * 2 + (16 - df["SURVEY_ROUND"])
 
     cond = (df["SURVEY_ROUND"] > 16) & (df["SURVEY_YEAR"] % 2).astype(bool)
     df.loc[cond, "REQUIRED_SHIFT_WK_" + repr(week_num)] = (
-        df["ROUND_JOBS_WK_" + repr(week_num)] - df["SURVEY_ROUND"]
-    ) * 2 + 1
+                                                                  df["ROUND_JOBS_WK_" + repr(
+                                                                      week_num)] - df[
+                                                                      "SURVEY_ROUND"]
+                                                          ) * 2 + 1
 
     cond = (df["SURVEY_ROUND"] > 16) & ~(df["SURVEY_YEAR"] % 2).astype(bool)
     df.loc[cond, "REQUIRED_SHIFT_WK_" + repr(week_num)] = (
-        df["ROUND_JOBS_WK_" + repr(week_num)] - df["SURVEY_ROUND"]
-    ) * 2
+                                                                  df["ROUND_JOBS_WK_" + repr(
+                                                                      week_num)] - df[
+                                                                      "SURVEY_ROUND"]
+                                                          ) * 2
 
     df["JOB_YEAR_WK_" + repr(week_num)] = (
-        df["SURVEY_YEAR"] + df["REQUIRED_SHIFT_WK_" + repr(week_num)]
+            df["SURVEY_YEAR"] + df["REQUIRED_SHIFT_WK_" + repr(week_num)]
     )
 
 df_ext = pd.DataFrame(df.groupby(df["IDENTIFIER"]).apply(lambda x: data_shift(x)))
 
-df_ext.to_pickle("../../output/data/interim/jobs_with_occ_codes.pkl")
+df_ext.to_pickle(
+    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/interim/jobs_with_occ_codes.pkl")
