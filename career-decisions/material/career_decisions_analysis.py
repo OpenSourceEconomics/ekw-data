@@ -98,8 +98,8 @@ def get_choices(df):
         label.split("_")[0].capitalize() for label in crosstab_labels[:-1]
     ]
 
-    table_choices["total"].to_csv(f"{SAVEPATH}/total_choices_by_age.csv")
-    table_choices["share"].to_csv(f"{SAVEPATH}/share_choices_by_age.csv")
+    table_choices["total"].to_csv(f"{SAVEPATH}/total-choices-by-age.csv")
+    table_choices["share"].to_csv(f"{SAVEPATH}/share-choices-by-age.csv")
 
     return table_choices
 
@@ -127,7 +127,7 @@ def get_average_wages(df):
         label.split("_")[0].capitalize() for label in list(average_wages.keys())
     ]
 
-    average_wages.to_csv(f"{SAVEPATH}/average_wages.csv")
+    average_wages.to_csv(f"{SAVEPATH}/average-wages.csv")
 
     return average_wages
 
@@ -167,7 +167,7 @@ def get_initial_schooling(df):
     df_initial_schooling.columns = [label.capitalize() for label in list(initial_schooling.keys())]
     df_initial_schooling.set_index("Years")
 
-    df_initial_schooling.to_csv(f"{SAVEPATH}/initial_schooling.csv")
+    df_initial_schooling.to_csv(f"{SAVEPATH}/initial-schooling.csv")
 
     return [df_initial_schooling, initial_schooling]
 
@@ -222,7 +222,7 @@ def get_initial_schooling_activity(df):
     df_initial_schooling_activity = pd.DataFrame.from_dict(initial_schooling_activity)
     df_initial_schooling_activity.index = [["Blue", "White", "Military", "School", "Home", "Total"]]
 
-    df_initial_schooling_activity.to_csv(f"{SAVEPATH}/initial_schooling_activity.csv")
+    df_initial_schooling_activity.to_csv(f"{SAVEPATH}/initial-schooling-activity.csv")
 
     return df_initial_schooling_activity
 
@@ -331,10 +331,11 @@ def get_df_transition_probabilities(tm, direction, save_include_fifteen=False):
         [label.split("_")[0].capitalize() for label in list(df_trans_probs.index)],
     )
 
+    dir_save = direction.replace("_", "-")
     if not save_include_fifteen:
-        df_trans_probs.to_csv(f"{SAVEPATH}/transition_probabilties_{direction}.csv")
+        df_trans_probs.to_csv(f"{SAVEPATH}/transition-probabilties-{dir_save}.csv")
     elif save_include_fifteen:
-        df_trans_probs.to_csv(f"{SAVEPATH}/transition_probabilties_{direction}_fifteen.csv")
+        df_trans_probs.to_csv(f"{SAVEPATH}/transition-probabilties-{dir_save}-fifteen.csv")
 
     return df_trans_probs
 
