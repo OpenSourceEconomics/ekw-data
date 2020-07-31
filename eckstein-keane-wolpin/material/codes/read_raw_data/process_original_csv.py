@@ -58,12 +58,12 @@ for filename in [
     with open(
         f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/original_extended.sdf", "a"
     ) as original_ext_description:
-        with open(
-            f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/{filename}.sdf"
-        ) as infile:
+        with open(f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/{filename}.sdf") as infile:
 
             for line in infile:
                 if line not in lineset:
                     original_ext_description.write(line)
 
-original_ext_df.to_csv(f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/original_extended.csv")
+original_ext_df.to_csv(
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/original_extended.csv"
+)

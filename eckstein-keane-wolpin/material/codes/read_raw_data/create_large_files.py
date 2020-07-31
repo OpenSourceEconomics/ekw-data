@@ -31,10 +31,8 @@ df = pd.read_csv(
 
 for num in range(1, 17):
     aux_df = pd.read_csv(
-        f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/labor_force_status_all_weeks-{num}.csv",
-        # PROJECT_DIR / "eckstein-keane-wolpin/material/sources/labor_force_status_all_weeks-"
-        # + repr(num)
-        # + ".csv",
+        f"{PROJECT_DIR}/"
+        f"eckstein-keane-wolpin/material/sources/labor_force_status_all_weeks-{num}.csv",
         index_col="R0000100",
     )
     df = df.append(aux_df)
