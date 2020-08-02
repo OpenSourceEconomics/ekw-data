@@ -13,7 +13,7 @@ for file in ["create_large_files", "process_original_csv"]:
 PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
 if __name__ == "__main__":
-    fname = f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/raw/original_extended.pkl"
+    fname = f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/raw/ekw_raw.pkl"
 
     source_obj = SourceCls()
 

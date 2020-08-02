@@ -280,13 +280,9 @@ def create_military_wages(agent):
 def get_schooling_experience(agent):
     """This function creates the variable that indicates the level of schooling an individual has
     obtained at a given age """
-    agent["BASELINE_SCHOOLING"] = agent.loc[agent["AGE"] == 15, "REAL_HIGHEST_GRADE_COMPLETED"]
-    agent["BASELINE_SCHOOLING"].ffill(inplace=True)
-
-    agent["ADDITIONAL_SCHOOLING"] = (agent["CHOICE"] == "schooling").astype(int).cumsum().shift(1)
-
-    agent["SCHOOLING"] = agent["BASELINE_SCHOOLING"] + agent["ADDITIONAL_SCHOOLING"]
-    agent.loc[agent["AGE"] == 15, "SCHOOLING"] = agent.loc[agent["AGE"] == 15, "BASELINE_SCHOOLING"]
-    agent.drop(columns=["BASELINE_SCHOOLING", "ADDITIONAL_SCHOOLING"], inplace=True)
+    base_schooling = agent.loc[agent["AGE"] == 15, "HGC"].item()
+    agent["SCHOOLING"] = base_schooling + (agent["CHOICE"] == "schooling").astype(
+        int
+    ).cumsum().shift(1).fillna(0)
 
     return agent

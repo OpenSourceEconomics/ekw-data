@@ -5,34 +5,17 @@ import numpy as np
 import pandas as pd
 
 
-def extend_survey_year(agent):
-    agent.sort_values(by=["AGE"], inplace=True)
-    cond = agent["AGE"] == 25
-    agent["aux_extend_survey_year"] = agent.loc[cond, "SURVEY_YEAR"] - 25
-    agent["aux_extend_survey_year"].ffill(inplace=True)
-    agent["aux_extend_survey_year"].bfill(inplace=True)
+def extend_df(agent):
 
-    cond = agent["SURVEY_YEAR"].isna()
-    agent.loc[cond, "SURVEY_YEAR"] = (agent["aux_extend_survey_year"] + agent["AGE"]).astype(
-        "Int64"
-    )
+    age_df = pd.DataFrame(np.arange(15, 18), columns=["AGE"])
+    agent = agent.merge(age_df, on="AGE", how="outer", sort="AGE")
 
-    agent.drop(columns=["aux_extend_survey_year"], inplace=True)
+    agent["IDENTIFIER"].bfill(inplace=True)
 
-    return agent
+    cond = agent["AGE"].eq(25)
+    aux_age = (agent.loc[cond, "SURVEY_YEAR"] - 25).item()
 
-
-def extend_sample_id(agent):
-    agent["SAMPLE_ID"].bfill(inplace=True)
-    agent["SAMPLE_ID"].ffill(inplace=True)
-
-    return agent
-
-
-def extend_table_13_covariates(agent):
-    for var in ["NUMBER_OF_SIBLINGS", "FAMILY_INCOME", "MOTHER_HGC", "HH_STRUCTURE_AGE_14"]:
-        agent[var].bfill(inplace=True)
-        agent[var].ffill(inplace=True)
+    agent["SURVEY_YEAR"] = (agent["AGE"] + aux_age).astype("Int64")
 
     return agent
 
@@ -40,25 +23,21 @@ def extend_table_13_covariates(agent):
 def adjust_hgc_12_for_ged(agent):
     """This function reduces the HGC variable if an increase in the HGC variable
     is caused by the completion of a GED"""
-    agent["AUX_HGC_GED"] = agent["REAL_HIGHEST_GRADE_COMPLETED"].copy()
 
-    agent["AUX_HGC_GED"].ffill(inplace=True)
+    cond = agent["HGC"].shift(-1).eq(12) & agent["HGC"].ffill().ne(12)
 
-    agent["grade_before_GED"] = np.nan
+    agent["AUX_HGC"] = agent["HGC"].ffill()
 
-    cond = (agent["AUX_HGC_GED"].shift(-1) == 12) & (~(agent["AUX_HGC_GED"] == 12))
-    agent.loc[cond, "grade_before_GED"] = agent.loc[cond, "AUX_HGC_GED"]
-    agent["grade_before_GED"].ffill(inplace=True)
-    agent["grade_before_GED"].bfill(inplace=True)
+    if len(agent.loc[cond, "AUX_HGC"]) != 0:
+        less_years_bc_ged = 12 - agent.loc[cond, "AUX_HGC"].fillna(0).iloc[0].astype(int)
 
-    agent["less_years_bc_GED"] = (12 - agent["grade_before_GED"]).fillna(0)
+    else:
+        less_years_bc_ged = 0
 
-    cond = agent["REAL_HIGHEST_GRADE_COMPLETED"] >= 12
-    agent.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = (
-        agent.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] - agent.loc[cond, "less_years_bc_GED"]
-    )
+    cond = agent["HGC"].ge(12)
+    agent.loc[cond, "HGC"] = agent.loc[cond, "HGC"] - less_years_bc_ged
 
-    return agent
+    return agent.drop(columns=["AUX_HGC"])
 
 
 def simple_two_grade_jump(agent):
@@ -66,15 +45,11 @@ def simple_two_grade_jump(agent):
     in one year and none in the next year so that one grade is completed in each of the two years.
     E. g. an HGC variable progression of 12 -> 14 -> 14 is changed to 12 -> 13 -> 14.
     """
-    cond_1 = agent["REAL_HIGHEST_GRADE_COMPLETED"].diff() == 2
-    cond_2 = agent["REAL_HIGHEST_GRADE_COMPLETED"].eq(
-        agent["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1)
-    )
+    cond_1 = agent["HGC"].diff().eq(2)
+    cond_2 = agent["HGC"].eq(agent["HGC"].shift(-1))
     cond_3 = agent["MONTHS_ATTENDED_SCHOOL"].shift(1).gt(0) & agent["MONTHS_ATTENDED_SCHOOL"].gt(0)
 
-    agent.loc[cond_1 & cond_2 & cond_3, "REAL_HIGHEST_GRADE_COMPLETED"] = (
-        agent.loc[cond_1 & cond_2 & cond_3, "REAL_HIGHEST_GRADE_COMPLETED"] - 1
-    )
+    agent.loc[cond_1 & cond_2 & cond_3, "HGC"] = agent.loc[cond_1 & cond_2 & cond_3, "HGC"] - 1
 
     return agent
 
@@ -184,9 +159,11 @@ def data_shift(agent):
                 ["WAGE_" + repr(int(num)) + "_WK_" + repr(week_num)], axis=1, inplace=True
             )
 
-    cols = [col for col in agent_ext if col.startswith("JOB_CHOICE_WK_")]
-    cols.extend([col for col in agent_ext if col.startswith("ROUND_JOBS_WK_")])
-    cols.extend([col for col in agent_ext if col.startswith("WAGE_WK_")])
-    cols.extend(["SURVEY_ROUND"])
+    agent = agent_ext.loc[
+        :,
+        agent_ext.columns.str.startswith(
+            ("JOB_CHOICE_WK_", "ROUND_JOBS_WK_", "WAGE_WK_", "SURVEY_ROUND")
+        ),
+    ]
 
-    return agent_ext[cols]
+    return agent

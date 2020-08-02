@@ -14,7 +14,7 @@ from functions_prelim_adjust import data_shift
 PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
 df = pd.read_pickle(
-    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/raw/original_extended_interim.pkl"
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/interim/ekw_interim.pkl"
 )
 
 # construct a variable that displays which survey round took place in a given year
@@ -85,5 +85,5 @@ for week_num in [1, 7, 13, 14, 20, 26, 40, 46, 52]:
 df_ext = pd.DataFrame(df.groupby(df["IDENTIFIER"]).apply(lambda x: data_shift(x)))
 
 df_ext.to_pickle(
-    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/interim/jobs_with_occ_codes.pkl"
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/interim/jobs_with_occ_codes.pkl"
 )

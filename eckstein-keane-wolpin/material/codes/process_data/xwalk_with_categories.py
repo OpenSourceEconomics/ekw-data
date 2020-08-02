@@ -13,7 +13,7 @@ import pandas as pd
 PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
 crosswalk = pd.read_excel(
-    PROJECT_DIR / "eckstein-keane-wolpin/material/sources/occ_crosswalks/occ1990_xwalk.xls"
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/occ_crosswalks/occ1990_xwalk.xls"
 )
 crosswalk = crosswalk.iloc[:, [0, 1, 4, 7, 8]]
 crosswalk.columns = ["OCC1990", "DESCRIPTION", "CPS_1970", "CPS_2000_1", "CPS_2000_5"]
@@ -223,5 +223,5 @@ crosswalk["CATEGORY"].loc[crosswalk["CPS_2000_1"] == 933] = "white_collar"
 crosswalk["CPS_2002"] = crosswalk["CPS_2000_1"].copy() * 10
 
 crosswalk.drop(columns=["category_aux"]).to_pickle(
-    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/interim/categorized_xwalk.pkl"
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/interim/categorized_xwalk.pkl"
 )

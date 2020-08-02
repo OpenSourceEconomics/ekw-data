@@ -21,7 +21,7 @@ PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
 test_df = pd.DataFrame(
     {
-        "REAL_HIGHEST_GRADE_COMPLETED": [9, 9, 12, 13, 14],
+        "HGC": [9, 9, 12, 13, 14],
         "ENROLLED_SCHOOL_OCTOBER": [1, 1, 1, 1, 1],
         "ENROLLED_SCHOOL_JANUARY": [1, 1, 1, 1, 1],
         "ENROLLED_SCHOOL_APRIL": [0, 0, 0, 0, 0],
@@ -29,11 +29,11 @@ test_df = pd.DataFrame(
 )
 mock_df = adjust_hgc_12_for_ged(test_df)
 
-np.testing.assert_array_equal(mock_df["REAL_HIGHEST_GRADE_COMPLETED"], [9, 9, 10, 11, 12])
+np.testing.assert_array_equal(mock_df["HGC"], [9, 9, 9, 10, 11])
 
 test_df = pd.DataFrame(
     {
-        "REAL_HIGHEST_GRADE_COMPLETED": [9, 9, 12, 13, 14],
+        "HGC": [9, 9, 12, 13, 14],
         "ENROLLED_SCHOOL_OCTOBER": [0, 0, 0, 0, 0],
         "ENROLLED_SCHOOL_JANUARY": [0, 0, 0, 0, 0],
         "ENROLLED_SCHOOL_APRIL": [0, 0, 0, 0, 0],
@@ -41,7 +41,7 @@ test_df = pd.DataFrame(
 )
 mock_df = adjust_hgc_12_for_ged(test_df)
 
-np.testing.assert_array_equal(mock_df["REAL_HIGHEST_GRADE_COMPLETED"], [9, 9, 9, 10, 11])
+np.testing.assert_array_equal(mock_df["HGC"], [9, 9, 9, 10, 11])
 
 
 col = [
@@ -280,18 +280,15 @@ np.testing.assert_array_equal(
 
 
 test_df = pd.DataFrame(
-    {
-        "REAL_HIGHEST_GRADE_COMPLETED": [12, 14, 14, 15, 17, 17],
-        "MONTHS_ATTENDED_SCHOOL": [9, 9, 7, 7, 0, 10],
-    }
+    {"HGC": [12, 14, 14, 15, 17, 17], "MONTHS_ATTENDED_SCHOOL": [9, 9, 7, 7, 0, 10]}
 )
 mock_df = simple_two_grade_jump(test_df)
 
-np.testing.assert_array_equal(mock_df["REAL_HIGHEST_GRADE_COMPLETED"], [12, 13, 14, 15, 17, 17])
+np.testing.assert_array_equal(mock_df["HGC"], [12, 13, 14, 15, 17, 17])
 
 
 df = pd.read_pickle(
-    PROJECT_DIR / "eckstein-keane-wolpin/material/output/data/final/original_extended_final.pkl"
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/final/ekw_ext_all_vars.pkl"
 )
 
 # As we will sum over them later, we have to check that there are no (necessarily wrong) negative
@@ -304,7 +301,7 @@ assert (
 )
 
 # We have to check that the HGC variable does not have missing values
-ck.has_no_nans(df, columns=["REAL_HIGHEST_GRADE_COMPLETED"])
+ck.has_no_nans(df, columns=["HGC"])
 
 # All values of the choice options have to correspond to one of the five choice options
 assert df["CHOICE"].isin(["schooling", "white_collar", "blue_collar", "military", "home"]).all()
