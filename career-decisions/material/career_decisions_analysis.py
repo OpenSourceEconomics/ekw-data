@@ -1,7 +1,11 @@
 """Analysis functions for career decisions data."""
+import os
 
 import pandas as pd
 import numpy as np
+
+SAVEPATH = os.environ["PROJECT_ROOT"] + "/career-decisions/material"
+RAW_DATA = os.environ["PROJECT_ROOT"] + "/career-decisions/career-decisions.raw"
 
 
 def get_prepare_career_decisions_data(file):
@@ -94,6 +98,9 @@ def get_choices(df):
         label.split("_")[0].capitalize() for label in crosstab_labels[:-1]
     ]
 
+    table_choices["total"].to_csv(f"{SAVEPATH}/total-choices-by-age.csv")
+    table_choices["share"].to_csv(f"{SAVEPATH}/share-choices-by-age.csv")
+
     return table_choices
 
 
@@ -119,6 +126,8 @@ def get_average_wages(df):
     average_wages.columns = [
         label.split("_")[0].capitalize() for label in list(average_wages.keys())
     ]
+
+    average_wages.to_csv(f"{SAVEPATH}/average-wages.csv")
 
     return average_wages
 
@@ -157,6 +166,8 @@ def get_initial_schooling(df):
     df_initial_schooling = pd.DataFrame.from_dict(initial_schooling)
     df_initial_schooling.columns = [label.capitalize() for label in list(initial_schooling.keys())]
     df_initial_schooling.set_index("Years")
+
+    df_initial_schooling.to_csv(f"{SAVEPATH}/initial-schooling.csv")
 
     return [df_initial_schooling, initial_schooling]
 
@@ -210,6 +221,8 @@ def get_initial_schooling_activity(df):
 
     df_initial_schooling_activity = pd.DataFrame.from_dict(initial_schooling_activity)
     df_initial_schooling_activity.index = [["Blue", "White", "Military", "School", "Home", "Total"]]
+
+    df_initial_schooling_activity.to_csv(f"{SAVEPATH}/initial-schooling-activity.csv")
 
     return df_initial_schooling_activity
 
@@ -290,7 +303,7 @@ def make_transition_matrix(df, include_fifteen=False):
     return transition_matrix
 
 
-def get_df_transition_probabilities(tm, direction):
+def get_df_transition_probabilities(tm, direction, save_include_fifteen=False):
     """Create dataframe of transition probabilities for given direction.
 
     Parameters:
@@ -318,4 +331,30 @@ def get_df_transition_probabilities(tm, direction):
         [label.split("_")[0].capitalize() for label in list(df_trans_probs.index)],
     )
 
+    dir_save = direction.replace("_", "-")
+    if not save_include_fifteen:
+        df_trans_probs.to_csv(f"{SAVEPATH}/transition-probabilties-{dir_save}.csv")
+    elif save_include_fifteen:
+        df_trans_probs.to_csv(f"{SAVEPATH}/transition-probabilties-{dir_save}-fifteen.csv")
+
     return df_trans_probs
+
+
+# Stand-alone export of tables
+if __name__ == "__main__":
+
+    df = get_prepare_career_decisions_data(RAW_DATA)
+    df = df.groupby("Identifier").apply(lambda x: get_working_experience(x))
+
+    get_choices(df)
+
+    get_average_wages(df)
+
+    get_initial_schooling(df)
+    get_initial_schooling_activity(df)
+
+    get_df_transition_probabilities(make_transition_matrix(df), "origin_to_destination")
+    get_df_transition_probabilities(make_transition_matrix(df), "destination_from_origin")
+    get_df_transition_probabilities(
+        make_transition_matrix(df, include_fifteen=True), "origin_to_destination", True
+    )

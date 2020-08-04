@@ -6,8 +6,8 @@ font.size: 20
 lines.linewidth: 5
 image.cmap: jet
 
-axes.labelsize : 15
-axes.titlesize : 15
+axes.labelsize : 16
+axes.titlesize : 16
 
 axes.spines.right: False
 axes.spines.left: True
