@@ -10,7 +10,6 @@ import pandas as pd
 from functions_extended_clean import get_occ_hours
 from functions_extended_clean import weeks_hours_worked
 from functions_extended_clean import clean_missing_wages
-from functions_extended_clean import clean_military_wages
 from functions_extended_clean import create_wages
 from functions_extended_clean import create_military_wages
 from functions_extended_clean import get_schooling_experience
@@ -84,8 +83,7 @@ df.loc[(df["SURVEY_YEAR"].eq(1978)) & school_cond_2, "CHOICE"] = "schooling"
 
 # check whether the requirements for the choice "work" (see p. 484 in KW97; will below be
 # separated in blue, white, military)
-id_sorted_data = df.groupby(df["IDENTIFIER"])
-df = id_sorted_data.apply(lambda x: weeks_hours_worked(x))
+df = df.groupby(df["IDENTIFIER"]).apply(lambda x: weeks_hours_worked(x))
 
 # Condition 1: individual was employed in at least two-thirds of the (non-missing) weeks
 work_cond_1 = (df["WORKED_WEEKS"] / df["EMP_NONMISSING_WEEKS"]).ge(2 / 3)
@@ -118,14 +116,11 @@ gnp_deflation = pd.read_csv(
     ".csv",
     index_col="SURVEY_YEAR",
 )
-
 gnp_deflation["GNP_DEFL_BASE_1987"] = (
     gnp_deflation["IMPLICIT_GNP"] / gnp_deflation.loc[1987, "IMPLICIT_GNP"]
 )
-
 df = df.merge(gnp_deflation, left_on="SURVEY_YEAR", right_index=True, how="left")
-
-df.sort_values(by=["IDENTIFIER", "SURVEY_YEAR"], inplace=True)
+df.sort_index(inplace=True)
 
 
 # Translate the occupation codes in the "CHOICE_WK" variables to white/blue collar taking
@@ -142,7 +137,6 @@ categories_df.columns = [
     "CPS_1970",
     "CPS_2000_1",
     "CPS_2000_5",
-    "category_service",
     "CATEGORY",
     "CPS_2002",
 ]
@@ -267,7 +261,7 @@ df.loc[cond_1 & cond_2, "CHOICE"] = (
 )
 
 # In case there is a tie between two rows (same number of weeks worked in both occupations),
-# the max() function in Python chooses the first row encountered (see
+# the max() function in Python chooses the first column encountered (see
 # https://stackoverflow.com/questions/6783000/which-maximum-does-python-pick-in-the-case-of-a-tie).
 # To solve a tie between white- and blue-collar, we choose the occupation in which more hours
 # were worked in a given year.
@@ -329,8 +323,6 @@ df.loc[cond, "HOME_CHOICE"] = "residual"
 
 # We clean and create the yearly income data
 df = df.groupby(df["IDENTIFIER"]).apply(lambda x: clean_missing_wages(x))
-
-df = df.groupby(df["IDENTIFIER"]).apply(lambda x: clean_military_wages(x))
 
 df = df.groupby(df["IDENTIFIER"]).apply(lambda x: create_wages(x))
 
@@ -507,7 +499,10 @@ ext_kw_df.rename(
     inplace=True,
 )
 ext_kw_df.to_csv(
-    PROJECT_DIR / "eckstein-keane-wolpin/eckstein-keane-wolpin-extended.csv", index=False, sep="\t"
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/eckstein-keane-wolpin/"
+    f"eckstein-keane-wolpin-extended.csv",
+    index=False,
+    sep="\t",
 )
 
 # create and save replication of original KW97 data set, beginning at age 16
@@ -523,4 +518,8 @@ kw_df.rename(
     },
     inplace=True,
 )
-kw_df.to_csv(PROJECT_DIR / "eckstein-keane-wolpin/eckstein-keane-wolpin.csv", index=False, sep="\t")
+kw_df.to_csv(
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/eckstein-keane-wolpin/eckstein-keane-wolpin.csv",
+    index=False,
+    sep="\t",
+)

@@ -139,49 +139,29 @@ def clean_missing_wages(agent):
     return agent
 
 
-def clean_military_wages(agent):
-
-    agent["MILITARY_INCOME_NA"] = 0
-
-    for week_num in range(40, 53):
-        cond = agent["EMP_STATUS_WK_" + repr(week_num)].eq(7.0) & agent["INCOME_MILITARY"].isna()
-        agent["MILITARY_INCOME_NA"] += cond.astype(int)
-
-    for week_num in range(1, 40):
-        cond = (
-            agent["EMP_STATUS_WK_" + repr(week_num)].shift(-1).eq(7.0)
-            & agent["INCOME_MILITARY"].shift(-1).isna()
-        )
-        agent["MILITARY_INCOME_NA"] += cond.astype(int)
-
-    return agent
-
-
 def create_wages(agent):
-    """This function creates real and nominal incomes for a given individual working in either
-    a blue-collar or white-collar occupation following the instructions on page 484 of KW97
+    """This function creates real incomes for a given individual working in either
+    a blue-collar or white-collar occupation following the instructions on page 484 of KW97.
+    Additionally, we also compute the corresponding average hourly wage
     """
 
     agent = clean_missing_wages(agent)
 
-    agent["REAL_SUM_WEEKLY_WAGES"] = 0
-    agent["NOMINAL_SUM_WEEKLY_WAGES"] = 0
-    agent["REAL_AVG_WEEKLY_WAGE"] = np.nan
-    agent["NOMINAL_AVG_WEEKLY_WAGE"] = np.nan
+    agent["SUM_WEEKLY_WAGES"] = 0
+    agent["AVG_WEEKLY_WAGE"] = np.nan
     agent["WEEKS_IN_MAJOR_OCC"] = 0
-    agent["HOURLY_WAGES"] = 0
+    agent["SUM_HOURLY_WAGES"] = 0
 
     for week_num in [1, 7, 13, 14, 20, 26]:
         cond = (agent["OCC_JC_WK_" + repr(week_num)].shift(-1) == agent["CHOICE"]).astype(int)
         nominal_weekly_wage = agent["WAGE_WK_" + repr(week_num)].shift(-1) * agent[
             "EMP_HOURS_WK_" + repr(week_num)
         ].shift(-1)
-        agent["NOMINAL_SUM_WEEKLY_WAGES"] += (nominal_weekly_wage * cond).fillna(0)
-        agent["REAL_SUM_WEEKLY_WAGES"] += (
-            (nominal_weekly_wage / agent["GNP_DEFL_BASE_1987"].shift(-1)) * cond
+        agent["SUM_WEEKLY_WAGES"] += (
+            nominal_weekly_wage / agent["GNP_DEFL_BASE_1987"].shift(-1) * cond
         ).fillna(0)
         agent["WEEKS_IN_MAJOR_OCC"] += cond
-        agent["HOURLY_WAGES"] += agent["WAGE_WK_" + repr(week_num)].shift(-1) / agent[
+        agent["SUM_HOURLY_WAGES"] += agent["WAGE_WK_" + repr(week_num)].shift(-1) / agent[
             "GNP_DEFL_BASE_1987"
         ].shift(-1)
 
@@ -190,40 +170,28 @@ def create_wages(agent):
         nominal_weekly_wage = (
             agent["WAGE_WK_" + repr(week_num)] * agent["EMP_HOURS_WK_" + repr(week_num)]
         )
-        agent["NOMINAL_SUM_WEEKLY_WAGES"] += (nominal_weekly_wage * cond).fillna(0)
-        agent["REAL_SUM_WEEKLY_WAGES"] += (
-            (nominal_weekly_wage / agent["GNP_DEFL_BASE_1987"]) * cond
+        agent["SUM_WEEKLY_WAGES"] += (
+            nominal_weekly_wage / agent["GNP_DEFL_BASE_1987"] * cond
         ).fillna(0)
         agent["WEEKS_IN_MAJOR_OCC"] += cond
-        agent["HOURLY_WAGES"] += agent["WAGE_WK_" + repr(week_num)] / agent["GNP_DEFL_BASE_1987"]
+        agent["SUM_HOURLY_WAGES"] += (
+            agent["WAGE_WK_" + repr(week_num)] / agent["GNP_DEFL_BASE_1987"]
+        )
 
-    agent["REAL_AVG_WEEKLY_WAGE"] = agent["REAL_SUM_WEEKLY_WAGES"] / (
-        agent["WEEKS_IN_MAJOR_OCC"] * 100
-    )
-    agent["NOMINAL_AVG_WEEKLY_WAGE"] = agent["NOMINAL_SUM_WEEKLY_WAGES"] / (
-        agent["WEEKS_IN_MAJOR_OCC"] * 100
-    )
-    agent["AVERAGE_HOURLY_WAGE"] = agent["HOURLY_WAGES"] / (agent["WEEKS_IN_MAJOR_OCC"] * 100)
+    agent["AVG_WEEKLY_WAGE"] = agent["SUM_WEEKLY_WAGES"] / (agent["WEEKS_IN_MAJOR_OCC"] * 100)
+
+    agent["AVERAGE_HOURLY_WAGE"] = agent["SUM_HOURLY_WAGES"] / (agent["WEEKS_IN_MAJOR_OCC"] * 100)
 
     agent["INCOME"] = np.nan
-    agent["NOMINAL_INCOME"] = np.nan
 
     cond = agent["CHOICE"].isin(["blue_collar", "white_collar"])
-    agent.loc[cond, "INCOME"] = agent.loc[cond, "REAL_AVG_WEEKLY_WAGE"] * 50
-    agent.loc[cond, "NOMINAL_INCOME"] = agent.loc[cond, "NOMINAL_AVG_WEEKLY_WAGE"] * 50
+    agent.loc[cond, "INCOME"] = agent.loc[cond, "AVG_WEEKLY_WAGE"] * 50
 
     cond = agent["MISSPECIFIED_EMP_STATUS"].ge(1)
     agent.loc[cond, "INCOME"] = np.nan
 
     agent.drop(
-        columns=[
-            "REAL_SUM_WEEKLY_WAGES",
-            "NOMINAL_SUM_WEEKLY_WAGES",
-            "REAL_AVG_WEEKLY_WAGE",
-            "NOMINAL_AVG_WEEKLY_WAGE",
-            "WEEKS_IN_MAJOR_OCC",
-            "HOURLY_WAGES",
-        ],
+        columns=["SUM_WEEKLY_WAGES", "AVG_WEEKLY_WAGE", "WEEKS_IN_MAJOR_OCC", "SUM_HOURLY_WAGES"],
         inplace=True,
     )
 
@@ -236,43 +204,74 @@ def create_military_wages(agent):
     when an individual is in the military, average hours worked per week are assumed to be
     constant across weeks.
     """
-    agent = clean_military_wages(agent)
 
-    agent["sum_military_income"] = 0
-    agent["weeks_in_military"] = 0
+    agent["SUM_MILITARY_INCOME"] = 0
+    agent["WEEKS_IN_MILITARY"] = 0
     agent["WEEKS_MILITARY_PER_CALENDAR_YEAR"] = 0
 
-    for week_num in range(1, 53):
-        agent["WEEKS_MILITARY_PER_CALENDAR_YEAR"] += (
-            agent["EMP_STATUS_WK_" + repr(week_num)].eq(7.0)
-        ).astype("int")
+    agent["WEEKS_MILITARY_PER_CALENDAR_YEAR"] = (
+        agent.loc[:, agent.columns.str.startswith("EMP_STATUS_WK_")].eq(7.0).sum()
+    )
 
     agent["WEEKLY_MILITARY_INCOME"] = (
         agent["INCOME_MILITARY"] / agent["WEEKS_MILITARY_PER_CALENDAR_YEAR"]
     )
 
     for week_num in range(1, 40):
-        cond = (agent["EMP_STATUS_WK_" + repr(week_num)].shift(-1).eq(7.0)).astype(int)
-        agent["sum_military_income"] += (
+        cond = agent["EMP_STATUS_WK_" + repr(week_num)].shift(-1).eq(7.0)
+        agent["SUM_MILITARY_INCOME"] += (
             agent["WEEKLY_MILITARY_INCOME"].shift(-1) / agent["GNP_DEFL_BASE_1987"].shift(-1)
         ).fillna(0) * cond
-        agent["weeks_in_military"] += cond
+        agent["WEEKS_IN_MILITARY"] += cond
 
     for week_num in range(40, 53):
-        cond = (agent["EMP_STATUS_WK_" + repr(week_num)].eq(7.0)).astype(int)
-        agent["sum_military_income"] += (
+        cond = agent["EMP_STATUS_WK_" + repr(week_num)].eq(7.0)
+        agent["SUM_MILITARY_INCOME"] += (
             agent["WEEKLY_MILITARY_INCOME"] / agent["GNP_DEFL_BASE_1987"]
         ).fillna(0) * cond
-        agent["weeks_in_military"] += cond
+        agent["WEEKS_IN_MILITARY"] += cond
 
     agent["CALCULATED_MILITARY_INCOME"] = (
-        agent["sum_military_income"] / agent["weeks_in_military"]
+        agent["SUM_MILITARY_INCOME"] / agent["WEEKS_IN_MILITARY"]
     ) * 50
 
     cond_1 = agent["CHOICE"].eq("military")
-    cond_2 = agent["MILITARY_INCOME_NA"].eq(0)
     agent.loc[cond_1, "INCOME"] = agent.loc[cond_1, "CALCULATED_MILITARY_INCOME"]
-    agent.loc[cond_1 & ~cond_2, "INCOME"] = np.nan
+
+    cond_2 = (
+        agent["INCOME_MILITARY"].isna()
+        & agent.loc[
+            :,
+            agent.columns.str.startswith("EMP_STATUS_WK_")
+            & agent.columns.str.endswith(tuple([str(num) for num in range(40, 53)])),
+        ]
+        .eq(7.0)
+        .sum(axis=1)
+        .gt(0)
+    ) | (
+        agent["INCOME_MILITARY"].shift(-1).isna()
+        & agent.loc[
+            :,
+            agent.columns.str.startswith("EMP_STATUS_WK_")
+            & agent.columns.str.endswith(tuple([str(num) for num in range(1, 40)])),
+        ]
+        .shift(-1)
+        .eq(7.0)
+        .sum(axis=1)
+        .gt(0)
+    )
+
+    agent.loc[cond_1 & cond_2, "INCOME"] = np.nan
+
+    agent.drop(
+        columns=[
+            "SUM_MILITARY_INCOME",
+            "WEEKLY_MILITARY_INCOME",
+            "WEEKS_IN_MILITARY",
+            "WEEKS_MILITARY_PER_CALENDAR_YEAR",
+        ],
+        inplace=True,
+    )
 
     return pd.DataFrame(agent)
 

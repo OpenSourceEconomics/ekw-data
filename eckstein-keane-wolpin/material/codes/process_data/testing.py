@@ -5,9 +5,7 @@ import bulwark.checks as ck
 import numpy as np
 import pandas as pd
 
-from functions_extended_clean import clean_military_wages
 from functions_extended_clean import clean_missing_wages
-from functions_extended_clean import create_military_wages
 from functions_extended_clean import create_wages
 from functions_extended_clean import get_occ_hours
 from functions_extended_clean import weeks_hours_worked
@@ -208,27 +206,6 @@ test_df = pd.DataFrame(
 mock_df = create_wages(test_df)
 
 np.testing.assert_array_equal(mock_df["INCOME"], [40000, np.nan, 20000])
-
-col_list = ["EMP_STATUS_WK_" + repr(week) for week in range(1, 53)]
-row_list = [[7] * 52]
-aux_list = [5] * 20
-aux_list.extend([7] * 32)
-row_list.append(aux_list)
-row_list.append([7] * 52)
-test_df = pd.DataFrame(row_list, columns=col_list, index=[0, 1, 2])
-test_df["INCOME_MILITARY"] = pd.Series([52000, np.nan, 50000])
-
-mock_df = clean_military_wages(test_df)
-
-np.testing.assert_array_equal(mock_df["MILITARY_INCOME_NA"], [19, 13, 0])
-
-test_df["INCOME_MILITARY"] = pd.Series([52000, 40000, np.nan])
-test_df["GNP_DEFL_BASE_1987"] = pd.Series([0.8, 1, 1.3])
-test_df["CHOICE"] = pd.Series(["military", "military", "military"])
-
-mock_df = create_military_wages(test_df)
-
-np.testing.assert_array_equal(mock_df["INCOME"], [62500, np.nan, np.nan])
 
 
 col_list = ["JOB_NUMBER_WK_" + repr(week) for week in [1, 7, 13, 14, 20, 26, 40, 46, 52]]

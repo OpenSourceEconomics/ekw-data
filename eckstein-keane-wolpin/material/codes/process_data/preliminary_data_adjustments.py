@@ -37,7 +37,7 @@ df = df.groupby(df["IDENTIFIER"]).apply(lambda x: extend_df(x))
 df["Survey Year"] = df["SURVEY_YEAR"]
 df["Identifier"] = df["IDENTIFIER"]
 df.set_index(["Identifier", "Survey Year"], inplace=True)
-df.sort_values(by=["IDENTIFIER", "SURVEY_YEAR"], inplace=True)
+df.sort_index(inplace=True)
 
 # The HGC variables and the 'highest grade attended' cannot decrease and gaps
 # in these variables can thus be potentially interpolated.
@@ -83,15 +83,6 @@ df["HGC"] = df["REVISED_HIGHEST_GRADE_COMPLETED_MAY"].groupby(df["IDENTIFIER"]).
 df["REAL_ENROLLMENT_STATUS"] = (
     df["REVISED_ENROLLMENT_STATUS_MAY"].groupby(df["IDENTIFIER"]).shift(-1)
 )
-
-cond = df["WHICH_OF_HS_OR_GED"].isin([2.0])
-list_ged = list(df["IDENTIFIER"].loc[cond])
-cond = df["IDENTIFIER"].isin(list_ged)
-
-df[cond] = df[cond].groupby(df["IDENTIFIER"]).apply(lambda x: adjust_hgc_12_for_ged(x))
-
-df = df.groupby(df["IDENTIFIER"]).apply(lambda x: months_attended_school(x))
-df = df.groupby(df["IDENTIFIER"]).apply(lambda x: simple_two_grade_jump(x))
 
 for num in range(1, 6):
     cond = (df["IDENTIFIER"] == 5585) & (df["JOB_" + repr(num)] == 26)
@@ -737,31 +728,6 @@ df.loc[cond, "HGC"] = 19
 cond = (df["IDENTIFIER"] == 12106) & df["AGE"].isin([25, 26, 27])
 df.loc[cond, "HGC"] = df.loc[cond, "HGC"] - 1
 
-df["AUX_HGC"] = df["HGC"].ffill()
-cond_1 = (df["MONTHS_ATTENDED_SCHOOL"].diff().shift(-1) <= 0) & (
-    df["REAL_ENROLLMENT_STATUS"].shift(1).isin([2.0, 3.0])
-)
-cond_2 = ~(df["HGC"].shift(1).isna()) & (df["HGC"].isna()) & ~(df["HGC"].shift(-1).isna())
-cond_3 = (df["HGC"].shift(1) + 1) == df["HGC"].shift(-1)
-
-df.loc[cond_1 & cond_2 & cond_3, "HGC"] = df.loc[cond_1 & cond_2, "AUX_HGC"] + 1
-df.loc[~cond_1 & cond_2 & cond_3, "HGC"] = df.loc[~cond_1 & cond_2, "AUX_HGC"]
-
-df.drop(columns=["AUX_HGC"], inplace=True)
-
-df["AUX_HGC"] = df["HGC"].copy()
-
-df["HGC"] = (
-    df["HGC"]
-    .groupby(df["IDENTIFIER"])
-    .apply(lambda x: x.interpolate(method="linear", limit_area="inside"))
-)
-
-cond_1 = ~(df["HGC"].diff().shift(-1).isin([0.0, 1.0]))
-cond_2 = df["AUX_HGC"].isna()
-df.loc[cond_1 & cond_2, "HGC"] = np.nan
-
-df.drop(columns=["AUX_HGC"], inplace=True)
 
 # correct 'HGC' if degree was obtained between October and May
 
@@ -1144,6 +1110,44 @@ df.loc[cond, "HGC"] = 15
 # ID 12069: Bachelor degree 12/89
 cond = df["IDENTIFIER"].eq(12069) & df["SURVEY_YEAR"].eq(1989)
 df.loc[cond, "HGC"] = 15
+
+# Next, we adjust the HGC variable of individuals with a GED according to footnote 15
+cond = df["WHICH_OF_HS_OR_GED"].isin([2.0])
+list_ged = list(df["IDENTIFIER"].loc[cond])
+cond = df["IDENTIFIER"].isin(list_ged)
+df[cond] = df[cond].groupby(df["IDENTIFIER"]).apply(lambda x: adjust_hgc_12_for_ged(x))
+
+# We smooth grade jumps in which two grade levels are completed in one year and none in the next
+# if school was attended for at least one month in both years
+df = df.groupby(df["IDENTIFIER"]).apply(lambda x: months_attended_school(x))
+df = df.groupby(df["IDENTIFIER"]).apply(lambda x: simple_two_grade_jump(x))
+
+# We fill the remaining single missing values in the HGC variable
+df["AUX_HGC"] = df["HGC"].ffill()
+cond_1 = (df["MONTHS_ATTENDED_SCHOOL"].diff().shift(-1) <= 0) & (
+    df["REAL_ENROLLMENT_STATUS"].shift(1).isin([2.0, 3.0])
+)
+cond_2 = ~(df["HGC"].shift(1).isna()) & (df["HGC"].isna()) & ~(df["HGC"].shift(-1).isna())
+cond_3 = (df["HGC"].shift(1) + 1) == df["HGC"].shift(-1)
+
+df.loc[cond_1 & cond_2 & cond_3, "HGC"] = df.loc[cond_1 & cond_2, "AUX_HGC"] + 1
+df.loc[~cond_1 & cond_2 & cond_3, "HGC"] = df.loc[~cond_1 & cond_2, "AUX_HGC"]
+
+df.drop(columns=["AUX_HGC"], inplace=True)
+
+df["AUX_HGC"] = df["HGC"].copy()
+
+df["HGC"] = (
+    df["HGC"]
+    .groupby(df["IDENTIFIER"])
+    .apply(lambda x: x.interpolate(method="linear", limit_area="inside"))
+)
+
+cond_1 = ~(df["HGC"].diff().shift(-1).isin([0.0, 1.0]))
+cond_2 = df["AUX_HGC"].isna()
+df.loc[cond_1 & cond_2, "HGC"] = np.nan
+
+df.drop(columns=["AUX_HGC"], inplace=True)
 
 # save the dataframe
 df.to_pickle(f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/interim/ekw_interim.pkl")
