@@ -11,8 +11,8 @@ import matplotlib.ticker as mtick
 from itertools import compress
 from scipy.signal import savgol_filter
 
-SAVEPATH = os.environ["PROJECT_ROOT"] + "career-decisions/material"
-RAW_DATA = os.environ["PROJECT_ROOT"] + "career-decisions/career-decisions.raw"
+SAVEPATH = os.environ["PROJECT_ROOT"] + "/career-decisions/material"
+RAW_DATA = os.environ["PROJECT_ROOT"] + "/career-decisions/career-decisions.raw"
 
 
 def make_grayscale_cmap(cmap):

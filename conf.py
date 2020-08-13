@@ -51,12 +51,12 @@ nbsphinx_execute = "auto"
 nbsphinx_prolog = r"""
 {% set docname = env.doc2path(env.docname, base=None) %}
 .. |binder| image:: https://mybinder.org/badge_logo.svg
-    :target: https://mybinder.org/v2/gh/OpenSourceEconomics/ekw-data/master?filepath=data/{{ docname|e }}
+    :target: https://mybinder.org/v2/gh/OpenSourceEconomics/ekw-data/master/{{ docname|e }}
 
 .. only:: html
 
     .. nbinfo::
-        Download the notebook :download:`here <https://nbviewer.jupyter.org/github/OpenSourceEconomics/ekw-data/blob/master/data/{{ docname }}>`!
+        Download the notebook :download:`here <https://nbviewer.jupyter.org/github/OpenSourceEconomics/ekw-data/blob/master/{{ docname }}>`!
         Interactive online version: |binder|
 """
 

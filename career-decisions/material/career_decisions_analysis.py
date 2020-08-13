@@ -4,8 +4,8 @@ import os
 import pandas as pd
 import numpy as np
 
-SAVEPATH = os.environ["PROJECT_ROOT"] + "career-decisions/material"
-RAW_DATA = os.environ["PROJECT_ROOT"] + "career-decisions/career-decisions.raw"
+SAVEPATH = os.environ["PROJECT_ROOT"] + "/career-decisions/material"
+RAW_DATA = os.environ["PROJECT_ROOT"] + "/career-decisions/career-decisions.raw"
 
 
 def get_prepare_career_decisions_data(file):
