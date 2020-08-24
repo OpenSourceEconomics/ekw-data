@@ -3,6 +3,7 @@ to directly store them in our Github repo.
 """
 
 import os
+from glob import glob
 from pathlib import Path
 
 import pandas as pd
@@ -10,33 +11,19 @@ import pandas as pd
 PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
 # create original.csv
-df = pd.read_csv(
-    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/original-0.csv", index_col="R0000100"
+original_list = sorted(
+    glob(f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/original-*"),
+    key=lambda x: int(x.partition("-")[2].partition(".")[0]),
 )
-
-for num in range(1, 9):
-    aux_df = pd.read_csv(
-        f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/original-{num}.csv",
-        index_col="R0000100",
-    )
-    df = df.append(aux_df)
-
+df = pd.concat((pd.read_csv(file) for file in original_list))
 df.to_csv(f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/original.csv", index=True)
 
 # create labor_force_status_all_weeks.csv
-df = pd.read_csv(
-    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/labor_force_status_all_weeks-0.csv",
-    index_col="R0000100",
+labor_list = sorted(
+    glob(f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/labor_force_status_all_weeks-*"),
+    key=lambda x: int(x.partition("-")[2].partition(".")[0]),
 )
-
-for num in range(1, 17):
-    aux_df = pd.read_csv(
-        f"{PROJECT_DIR}/"
-        f"eckstein-keane-wolpin/material/sources/labor_force_status_all_weeks-{num}.csv",
-        index_col="R0000100",
-    )
-    df = df.append(aux_df)
-
+df = pd.concat((pd.read_csv(file) for file in labor_list))
 df.to_csv(
     f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/labor_force_status_all_weeks.csv",
     index=True,

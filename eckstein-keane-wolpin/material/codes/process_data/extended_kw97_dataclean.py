@@ -332,8 +332,9 @@ df = df.groupby(df["IDENTIFIER"]).apply(lambda x: create_military_wages(x))
 # deviations of the mean of all income values
 df["INCOME_RAW"] = df["INCOME"].copy()
 
-cond = df["INCOME"] > (df["INCOME"].mean() + 3 * df["INCOME"].std())
-df.loc[cond, "INCOME"] = np.nan
+for var in ["INCOME", "AVERAGE_HOURLY_WAGES"]:
+    cond = df[var].gt(df[var].mean() + 3 * df[var].std())
+    df.loc[cond, var] = np.nan
 
 # We construct the covariates that are used in Table 13
 cond = df["NUMBER_OF_SIBLINGS"].gt(4)
@@ -499,8 +500,7 @@ ext_kw_df.rename(
     inplace=True,
 )
 ext_kw_df.to_csv(
-    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/eckstein-keane-wolpin/"
-    f"eckstein-keane-wolpin-extended.csv",
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin-extended.csv",
     index=False,
     sep="\t",
 )
@@ -519,7 +519,5 @@ kw_df.rename(
     inplace=True,
 )
 kw_df.to_csv(
-    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/eckstein-keane-wolpin/eckstein-keane-wolpin.csv",
-    index=False,
-    sep="\t",
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin.csv", index=False, sep="\t",
 )

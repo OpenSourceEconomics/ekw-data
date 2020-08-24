@@ -180,7 +180,9 @@ def create_wages(agent):
 
     agent["AVG_WEEKLY_WAGE"] = agent["SUM_WEEKLY_WAGES"] / (agent["WEEKS_IN_MAJOR_OCC"] * 100)
 
-    agent["AVERAGE_HOURLY_WAGE"] = agent["SUM_HOURLY_WAGES"] / (agent["WEEKS_IN_MAJOR_OCC"] * 100)
+    agent["AVERAGE_HOURLY_WAGES"] = agent["SUM_HOURLY_WAGES"] / (agent["WEEKS_IN_MAJOR_OCC"] * 100)
+
+    agent["AVERAGE_HOURLY_WAGES"].replace(np.inf, np.nan, inplace=True)
 
     agent["INCOME"] = np.nan
 

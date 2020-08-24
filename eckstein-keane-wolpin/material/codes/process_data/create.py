@@ -9,4 +9,4 @@ for file in [
     "extended_kw97_dataclean",
     "testing",
 ]:
-    os.system("python " + file + ".py")
+    os.system(f"python {file}.py")

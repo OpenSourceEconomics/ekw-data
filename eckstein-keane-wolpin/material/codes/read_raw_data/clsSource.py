@@ -94,7 +94,7 @@ class SourceCls(object):
         """
         # Read from original data from CSV file
         self.source_wide = pd.read_csv(
-            PROJECT_DIR / "eckstein-keane-wolpin/material/sources/original_extended.csv",
+            f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/original_extended.csv",
             nrows=num_agents,
         )
 
