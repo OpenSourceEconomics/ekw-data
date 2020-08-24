@@ -28,7 +28,6 @@ test_df = pd.DataFrame(
 mock_df = adjust_hgc_12_for_ged(test_df)
 
 np.testing.assert_array_equal(mock_df["HGC"], [9, 9, 9, 10, 11])
-
 test_df = pd.DataFrame(
     {
         "HGC": [9, 9, 12, 13, 14],
@@ -40,7 +39,6 @@ test_df = pd.DataFrame(
 mock_df = adjust_hgc_12_for_ged(test_df)
 
 np.testing.assert_array_equal(mock_df["HGC"], [9, 9, 9, 10, 11])
-
 
 col = [
     "ENROLLED_SCHOOL_" + month
@@ -96,7 +94,6 @@ mock_df = get_occ_hours(test_df)
 
 np.testing.assert_array_equal(mock_df["WHITE_COLLAR_HOURS"], [127.3, 124.5])
 np.testing.assert_array_equal(mock_df["BLUE_COLLAR_HOURS"], [113.5, 0])
-
 test_df = pd.DataFrame(
     {
         "EMP_STATUS_WK_1": [0, 103],
@@ -125,12 +122,6 @@ mock_df = weeks_hours_worked(test_df)
 np.testing.assert_array_equal(mock_df["WORKED_WEEKS"], [7, 3])
 np.testing.assert_array_equal(mock_df["WORKED_WEEKS_MILITARY"], [2, 1])
 np.testing.assert_array_equal(mock_df["EMP_NONMISSING_WEEKS"], [8, 3])
-# np.testing.assert_equal(mock_df['HOURS_LIST'], [[50, 0, 0, 40, 0, 70, 30, 0, 17.3],
-#                                                [0, 15.5, 109, 0, 0, 0, 0, 0, 0]])
-np.testing.assert_array_equal(mock_df["WORKED_HOURS"], [207.3, 124.5])
-np.testing.assert_array_equal(mock_df["NECESSARY_WEEKS_WORKED"], [4, 1])
-np.testing.assert_array_equal(mock_df["MAX_HOURS"], [[70, 50, 40, 30], [109]])
-np.testing.assert_array_equal(mock_df["SUM_MAX_HOURS"], [190, 109])
 
 
 test_df = pd.DataFrame(
@@ -207,7 +198,6 @@ mock_df = create_wages(test_df)
 
 np.testing.assert_array_equal(mock_df["INCOME"], [40000, np.nan, 20000])
 
-
 col_list = ["JOB_NUMBER_WK_" + repr(week) for week in [1, 7, 13, 14, 20, 26, 40, 46, 52]]
 col_list_2 = ["JOB_YEAR_WK_" + repr(week) for week in [1, 7, 13, 14, 20, 26, 40, 46, 52]]
 col_list.extend(col_list_2)
@@ -255,14 +245,12 @@ np.testing.assert_array_equal(
     mock_df.loc[(1981), wage_col], [20001, 10001, np.nan, 30002, 50003, 10003, np.nan, 20004, 10004]
 )
 
-
 test_df = pd.DataFrame(
     {"HGC": [12, 14, 14, 15, 17, 17], "MONTHS_ATTENDED_SCHOOL": [9, 9, 7, 7, 0, 10]}
 )
 mock_df = simple_two_grade_jump(test_df)
 
 np.testing.assert_array_equal(mock_df["HGC"], [12, 13, 14, 15, 17, 17])
-
 
 df = pd.read_pickle(
     f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/final/ekw_ext_all_vars.pkl"
