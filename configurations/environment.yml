@@ -27,6 +27,7 @@ dependencies:
 - pytest-black
 - pytest-flake8
 - xlrd
+- bulwark
 - pip:
     - black-nb
     - flake8-nb

@@ -4,30 +4,18 @@
 """This script translates the weekly labor force status into occupation codes
 """
 
+import os
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-
 from functions_prelim_adjust import data_shift
 
+PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
-df = pd.read_pickle("../../output/data/raw/original_extended.pkl")
-
-# Construct variable 'AGE_OCT' that specifies the age of an individual on OCT, 1 of each survey year
-df["AGE_OCT"] = df["SURVEY_YEAR"] - df["YEAR_OF_BIRTH"]
-cond = df.MONTH_OF_BIRTH > 9
-df.loc[cond, "AGE_OCT"] = df["AGE_OCT"] - 1
-
-
-# Restrict sample to white males from the core random sample, i. e. SAMPLE_ID equals 1 or 2
-cond = df["SAMPLE_ID"].isin([1, 2])
-df = df.loc[cond]
-
-
-# Restrict sample to individuals who were age 16 or less on October 1, 1977
-# (<=> 'SURVEY_YEAR' - 'AGE_OCT' >= 1961)
-cond = df["SURVEY_YEAR"] - df["AGE_OCT"] >= 1961
-df = df.loc[cond]
-
+df = pd.read_pickle(
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/interim/ekw_interim.pkl"
+)
 
 # construct a variable that displays which survey round took place in a given year
 # if there was any (, e. g. 1979 = survey round #1)
@@ -49,7 +37,6 @@ cond = (df["SURVEY_YEAR"] > 1994) & (df["SURVEY_YEAR"] % 2).astype(bool)
 df.loc[cond, "SURVEY_ROUND"] = (((df["SURVEY_YEAR"] + 1) - 1994) / 2 + 16).astype(int)
 
 df["SURVEY_ROUND"] = pd.Series(df["SURVEY_ROUND"], dtype="Int64")
-
 
 # split the values in "EMP_STATUS_WK" into the relevant survey round (first digit/two digits)
 # and the relevant job number (last two digits)
@@ -97,4 +84,6 @@ for week_num in [1, 7, 13, 14, 20, 26, 40, 46, 52]:
 
 df_ext = pd.DataFrame(df.groupby(df["IDENTIFIER"]).apply(lambda x: data_shift(x)))
 
-df_ext.to_pickle("../../output/data/interim/jobs_with_occ_codes.pkl")
+df_ext.to_pickle(
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/interim/jobs_with_occ_codes.pkl"
+)

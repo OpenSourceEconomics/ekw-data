@@ -1,16 +1,19 @@
-import pandas as pd
-import numpy as np
+import os
+from pathlib import Path
 
-from special_treatments import aggregate_school_enrollment_monthly
+import numpy as np
+import pandas as pd
+from dct_mappings import get_mappings
+from special_treatments import aggregate_birth_information
 from special_treatments import aggregate_highest_degree_received
+from special_treatments import aggregate_school_enrollment_monthly
+from special_treatments import calculate_afqt_scores
 from special_treatments import cleaning_highest_grade_attended
+from special_treatments import create_is_interviewed
 from special_treatments import standarize_employer_information
 from special_treatments import standarize_job_information
-from special_treatments import aggregate_birth_information
-from special_treatments import calculate_afqt_scores
-from special_treatments import create_is_interviewed
 
-from dct_mappings import get_mappings
+PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
 # We maintain this list to contain all variables that are processed for the panel. This is checked
 # in the testing method.
@@ -90,7 +93,10 @@ class SourceCls(object):
         """ Read the original file from the NLSY INVESTIGATOR.
         """
         # Read from original data from CSV file
-        self.source_wide = pd.read_csv("../../sources/original_extended.csv", nrows=num_agents)
+        self.source_wide = pd.read_csv(
+            f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/original_extended.csv",
+            nrows=num_agents,
+        )
 
         # Process variable dictionary
         survey_years, dct = get_mappings()

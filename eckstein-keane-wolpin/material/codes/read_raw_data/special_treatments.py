@@ -1,8 +1,8 @@
 """ This module contains some functionality for some special treatment that is required for a
 selected few variables.
 """
-from numpy.testing import assert_equal
 import numpy as np
+from numpy.testing import assert_equal
 
 
 def aggregate_highest_degree_received(df):

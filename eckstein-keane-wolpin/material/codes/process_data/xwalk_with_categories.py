@@ -1,24 +1,29 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# This notebook creates an extended version of 'occ1990_xwalk.xls' where job categories
-# (white-collar or blue-collar) are assigned to every occupation code regardless of coding system.
+"""This module creates an extended version of 'occ1990_xwalk.xls' where job categories
+ (white-collar or blue-collar) are assigned to every occupation code regardless of coding system.
+"""
 
+import os
+from pathlib import Path
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-crosswalk = pd.read_excel("../../sources/occ_crosswalks/occ1990_xwalk.xls")
+PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
+
+crosswalk = pd.read_excel(
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/occ_crosswalks/occ1990_xwalk.xls"
+)
 crosswalk = crosswalk.iloc[:, [0, 1, 4, 7, 8]]
 crosswalk.columns = ["OCC1990", "DESCRIPTION", "CPS_1970", "CPS_2000_1", "CPS_2000_5"]
 # Delete headings in file
 crosswalk = crosswalk.loc[~(crosswalk.OCC1990 == "#")]
 
-
 # Transfer categorizations from CPS1970 codes to their corresponding OCC1990 codes
 
 crosswalk["category_aux"] = np.nan
-crosswalk["category_service"] = np.nan
 
 white_occ_codes = [i for i in range(1, 400)] + [801, 802]
 blue_occ_codes = [i for i in range(400, 800)] + [i for i in range(821, 985)]
@@ -33,12 +38,6 @@ crosswalk.loc[cond, "category_aux"] = "blue_collar"
 cond = crosswalk["CPS_1970"].isin(unemployed_codes)
 crosswalk.loc[cond, "category_aux"] = "unemployed"
 
-
-service_codes = [i for i in range(900, 985)]
-cond = crosswalk["CPS_1970"].isin(service_codes)
-crosswalk.loc[cond, "category_service"] = "service"
-
-
 # For OCC1990 codes which correspond to multiple codes in some coding system
 # (i. e. more than 1 row with the same OCC1990 code) assign the category of the first CPS1970 code
 # that corresponds to a given OCC1990 code
@@ -46,16 +45,13 @@ crosswalk.loc[cond, "category_service"] = "service"
 crosswalk_aux = crosswalk["category_aux"].groupby(crosswalk["OCC1990"]).first()
 crosswalk_aux = pd.DataFrame(crosswalk_aux).rename(columns={"category_aux": "CATEGORY"})
 
-
 crosswalk = crosswalk.merge(crosswalk_aux, on="OCC1990")
-
 
 # add the extra 1970 occupation code '590' and assign it to the choice 'military'
 # (see https://www.nlsinfo.org/sites/nlsinfo.org/files/attachments/121217/
 # Attachment%203-1970%20Industry%20and%20Occupational%20Codes.pdf, p. 22)
 
 row = [np.nan, "Current member of armed forces", 590, np.nan, np.nan, "military", "military"]
-
 
 # As OCC1990 codes sometimes incorporate > 1 CPS1970 codes, it is necessary to check
 # whether some OCC1990 codes include both a white-collar and a blue-collar CPS1970 code.
@@ -76,7 +72,6 @@ for key, value in aux_dict.items():
     else:
         continue
 
-
 # OCC1990 = 89
 crosswalk.loc[(crosswalk["CPS_1970"] == 924), "CATEGORY"] = "blue_collar"
 
@@ -91,7 +86,6 @@ crosswalk.loc[(crosswalk["CPS_1970"] == 802), "CATEGORY"] = "white_collar"
 
 # OCC1990 = 829
 crosswalk.loc[(crosswalk["CPS_1970"] == 221), "CATEGORY"] = "white_collar"
-
 
 # This cell categorizes OCC1990 codes that do not have a corresponding CPS1970 code
 
@@ -187,10 +181,9 @@ extended_military = {"Military": 905}
 
 occ_not_needed = [390, 391, 408, 480, 815, 890, 999]
 
-crosswalk["CATEGORY"][crosswalk["OCC1990"].isin(extended_white_col.values())] = "white_collar"
-crosswalk["CATEGORY"][crosswalk["OCC1990"].isin(extended_blue_col.values())] = "blue_collar"
-crosswalk["CATEGORY"][crosswalk["OCC1990"].isin(extended_military.values())] = "military"
-
+crosswalk.loc[crosswalk["OCC1990"].isin(extended_white_col.values()), "CATEGORY"] = "white_collar"
+crosswalk.loc[crosswalk["OCC1990"].isin(extended_blue_col.values()), "CATEGORY"] = "blue_collar"
+crosswalk.loc[crosswalk["OCC1990"].isin(extended_military.values()), "CATEGORY"] = "military"
 
 # check that all occupation codes that are supposed to be categorized, are indeed categorized
 
@@ -199,7 +192,6 @@ print(
         crosswalk["CATEGORY"].isna() & ~crosswalk["OCC1990"].isin(occ_not_needed)
     ]
 )
-
 
 # Check of assigned categories with description manual for CPS_2000_1
 # (available here: https://usa.ipums.org/usa/volii/occ2000.shtml)
@@ -219,7 +211,6 @@ crosswalk["CATEGORY"].loc[crosswalk["CPS_2000_1"] == 876] = "white_collar"
 # Ship Engineers CPS_2000_1 = 933, currently blue collar => white collar
 crosswalk["CATEGORY"].loc[crosswalk["CPS_2000_1"] == 933] = "white_collar"
 
-
 # => Few changes necessary which strengthens confidence in the initial assignment method
 
 # Create the 2002 and 2003 codes
@@ -227,7 +218,6 @@ crosswalk["CATEGORY"].loc[crosswalk["CPS_2000_1"] == 933] = "white_collar"
 # by adding a trailing 0 to the 2000 codes
 crosswalk["CPS_2002"] = crosswalk["CPS_2000_1"].copy() * 10
 
-
 crosswalk.drop(columns=["category_aux"]).to_pickle(
-    "../../output/data/interim/categorized_xwalk.pkl"
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/interim/categorized_xwalk.pkl"
 )

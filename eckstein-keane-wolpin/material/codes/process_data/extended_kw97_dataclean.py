@@ -1,5 +1,8 @@
-#!/usr/bin/env python
-# coding: utf-8
+"""This module creates the choice, wage and schooling variables and truncates observations
+according to Footnote 15 in KW97 """
+
+from pathlib import Path
+import os
 
 import numpy as np
 import pandas as pd
@@ -7,18 +10,19 @@ import pandas as pd
 from functions_extended_clean import get_occ_hours
 from functions_extended_clean import weeks_hours_worked
 from functions_extended_clean import clean_missing_wages
-from functions_extended_clean import clean_military_wages
 from functions_extended_clean import create_wages
 from functions_extended_clean import create_military_wages
 from functions_extended_clean import get_schooling_experience
 
-df = pd.read_pickle("../../output/data/interim/original_extended_interim.pkl")
+PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
+
+df = pd.read_pickle(
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/interim/ekw_interim.pkl"
+)
 
 # Construct variable that indicates whether or not an individual completed a grade in a given year,
 # i. e. if the HGC variable is increased by one in the following year
-df["GRADE_COMPLETED"] = (
-    df["REAL_HIGHEST_GRADE_COMPLETED"].groupby(df["IDENTIFIER"]).diff().shift(-1)
-)
+df["GRADE_COMPLETED"] = df["HGC"].groupby(df["IDENTIFIER"]).diff().shift(-1)
 
 # Set observation with (necessarily false) negative values for grade completed to 0.
 cond = df["GRADE_COMPLETED"] < 0
@@ -26,10 +30,12 @@ df.loc[cond, "GRADE_COMPLETED"] = 0
 
 # Merge the dataframe with the disentangled information on weekly jobs (occupation codes)
 # and wages from get_occ_codes_kw97.py
-job_choice_df = pd.read_pickle("../../output/data/interim/jobs_with_occ_codes.pkl")
+job_choice_df = pd.read_pickle(
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/interim/jobs_with_occ_codes.pkl"
+)
 job_choice_df.index.rename(["Identifier", "Survey Year"], inplace=True)
 
-df = df.join(job_choice_df, rsuffix="_y")
+df = df.merge(job_choice_df, how="left", left_index=True, right_index=True)
 
 # Initialize the choice variable
 df["CHOICE"] = np.nan
@@ -75,18 +81,16 @@ df.loc[(school_cond_2 & school_cond_4), "CHOICE"] = "schooling"
 # individuals are assigned to have chosen 'schooling' in 1978 if they completed a grade in this year
 df.loc[(df["SURVEY_YEAR"].eq(1978)) & school_cond_2, "CHOICE"] = "schooling"
 
-
 # check whether the requirements for the choice "work" (see p. 484 in KW97; will below be
 # separated in blue, white, military)
-id_sorted_data = df.groupby(df["IDENTIFIER"])
-df = id_sorted_data.apply(lambda x: weeks_hours_worked(x))
+df = df.groupby(df["IDENTIFIER"]).apply(lambda x: weeks_hours_worked(x))
 
 # Condition 1: individual was employed in at least two-thirds of the (non-missing) weeks
 work_cond_1 = (df["WORKED_WEEKS"] / df["EMP_NONMISSING_WEEKS"]).ge(2 / 3)
 
 # Condition 2: individual for at least 20 hours on average,
 # excluding weeks worked in military as there is no information on hours worked in the military
-work_cond_2 = df["SUM_MAX_HOURS"] >= (20 * df["NECESSARY_WEEKS_WORKED"])
+work_cond_2 = df["SUM_MAX_HOURS"].ge((20 * df["NECESSARY_WEEKS_WORKED"]))
 # work_cond_2 = (df['WORKED_HOURS'] / df['WORKED_WEEKS']).ge(20)
 
 # Condition 3: Less than 2/3 of the 9 relevant weeks have a missing labor force status,
@@ -105,27 +109,27 @@ df.loc[work_cond_1 & work_cond_2 & work_cond_3 & work_cond_4, "CHOICE"] = "Work"
 # missing 'hours worked' data in the military
 df.loc[work_cond_1 & ~work_cond_2 & work_cond_3 & work_cond_4, "CHOICE"] = "Potentially military"
 
-
 # Next, we read in the GNP deflation data, adjust the data to base year 1987 (from 2012) and
 # merge it with our previous data
 gnp_deflation = pd.read_csv(
-    "../../sources/gnp_deflator_data/st_louis_fed_deflator.csv", index_col="SURVEY_YEAR"
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/gnp_deflator_data/st_louis_fed_deflator"
+    ".csv",
+    index_col="SURVEY_YEAR",
 )
-
 gnp_deflation["GNP_DEFL_BASE_1987"] = (
     gnp_deflation["IMPLICIT_GNP"] / gnp_deflation.loc[1987, "IMPLICIT_GNP"]
 )
-
-df = df.merge(gnp_deflation, left_on="SURVEY_YEAR", right_index=True, how="outer")
-
-df.sort_values(by=["IDENTIFIER", "SURVEY_YEAR"], inplace=True)
+df = df.merge(gnp_deflation, left_on="SURVEY_YEAR", right_index=True, how="left")
+df.sort_index(inplace=True)
 
 
 # Translate the occupation codes in the "CHOICE_WK" variables to white/blue collar taking
 # into account the change of occupation coding in 2002 and 2004
 
 # Read in csv-file
-categories_df = pd.read_pickle("../../output/data/interim/categorized_xwalk.pkl")
+categories_df = pd.read_pickle(
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/interim/categorized_xwalk.pkl"
+)
 
 categories_df.columns = [
     "OCC1990",
@@ -133,7 +137,6 @@ categories_df.columns = [
     "CPS_1970",
     "CPS_2000_1",
     "CPS_2000_5",
-    "category_service",
     "CATEGORY",
     "CPS_2002",
 ]
@@ -181,7 +184,6 @@ for week_num in [1, 7, 13, 14, 20, 26, 40, 46, 52]:
         df.loc[cond_3, "JOB_CHOICE_WK_" + repr(week_num)].astype("Int64").map(category_dict_2002)
     )
 
-
 # Assign occupation choice 'military' for the week if 'EMP_STATUS' of the week == 7
 for week_num in [1, 7, 13, 14, 20, 26, 40, 46, 52]:
     cond = df["EMP_STATUS_WK_" + repr(week_num)].eq(7.0)
@@ -190,7 +192,6 @@ for week_num in [1, 7, 13, 14, 20, 26, 40, 46, 52]:
 # Shift military income by 1 given the definition of the variable
 # (TOTAL INCOME FROM MILITARY SERVICE IN PAST CALENDAR YEAR)
 df["INCOME_MILITARY"] = df["INCOME_MILITARY"].groupby(df["IDENTIFIER"]).apply(lambda x: x.shift(-1))
-
 
 # We now aggregate several metrics related to occupational choice
 
@@ -246,7 +247,6 @@ for week_num in [40, 46, 52]:
     )
     df["NOT_WORKING"] += (df["EMP_STATUS_WK_" + repr(week_num)].eq(2.0)).astype(int).fillna(0)
 
-
 df = df.groupby(df["IDENTIFIER"]).apply(lambda x: get_occ_hours(x))
 
 # Assign the occupation in which the most weeks were worked in a given year as the work choice
@@ -261,7 +261,7 @@ df.loc[cond_1 & cond_2, "CHOICE"] = (
 )
 
 # In case there is a tie between two rows (same number of weeks worked in both occupations),
-# the max() function in Python chooses the first row encountered (see
+# the max() function in Python chooses the first column encountered (see
 # https://stackoverflow.com/questions/6783000/which-maximum-does-python-pick-in-the-case-of-a-tie).
 # To solve a tie between white- and blue-collar, we choose the occupation in which more hours
 # were worked in a given year.
@@ -280,11 +280,9 @@ cond_2 = df[["WHITE_COLLAR", "BLUE_COLLAR", "MILITARY"]].idxmax(axis=1) == "MILI
 
 df.loc[cond_1 & cond_2, "CHOICE"] = "military"
 
-
 # We assign all observations that are not assigned to another option until now, to the option 'home'
 cond = (df["CHOICE"] == "Potentially military") | (df["CHOICE"].isna()) | (df["CHOICE"] == "Work")
 df.loc[cond, "CHOICE"] = "home"
-
 
 # We initialize a new variable so which decomposes the home option
 df["HOME_CHOICE"] = np.nan
@@ -323,25 +321,22 @@ df.loc[cond & school_cond_1 & ~school_cond_2, "HOME_CHOICE"] = "failed_schooling
 cond = df["CHOICE"].eq("home") & df["HOME_CHOICE"].isna()
 df.loc[cond, "HOME_CHOICE"] = "residual"
 
-
 # We clean and create the yearly income data
 df = df.groupby(df["IDENTIFIER"]).apply(lambda x: clean_missing_wages(x))
-
-df = df.groupby(df["IDENTIFIER"]).apply(lambda x: clean_military_wages(x))
 
 df = df.groupby(df["IDENTIFIER"]).apply(lambda x: create_wages(x))
 
 df = df.groupby(df["IDENTIFIER"]).apply(lambda x: create_military_wages(x))
 
-
 # We remove the most extreme income outliers, i. e. values that are not within 3 standard
 # deviations of the mean of all income values
 df["INCOME_RAW"] = df["INCOME"].copy()
 
-cond = df["INCOME"] > (df["INCOME"].mean() + 3 * df["INCOME"].std())
-df.loc[cond, "INCOME"] = np.nan
+for var in ["INCOME", "AVERAGE_HOURLY_WAGES"]:
+    cond = df[var].gt(df[var].mean() + 3 * df[var].std())
+    df.loc[cond, var] = np.nan
 
-# Table 13
+# We construct the covariates that are used in Table 13
 cond = df["NUMBER_OF_SIBLINGS"].gt(4)
 df.loc[cond, "NUMBER_OF_SIBLINGS"] = 4
 
@@ -399,62 +394,54 @@ df["PARENTAL_INCOME_VERY_HIGH"] = 0
 cond = df["FAMILY_INCOME"].ge((2 * df["FAMILY_INCOME"].median())) & ~df["FAMILY_INCOME"].isna()
 df.loc[cond, "PARENTAL_INCOME_VERY_HIGH"] = 1
 
-# We restrict sample to years in which individuals were at least 16
+# We restrict the sample to years in which individuals were at least 15
 cond = df["AGE"] >= 15
 df = df.loc[cond]
 
-df["aux_schooling"] = df["REAL_HIGHEST_GRADE_COMPLETED"].copy().shift(-1)
+# We construct choices for ages 15 and 16 if they correspond to years 1976 or 1977 in which there
+# is no information on schooling and labor force status available
+df["aux_schooling"] = df["HGC"].copy().shift(-1)
 
-cond = (
-    df["AGE"].eq(16)
-    & df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).ge(10)
-    & df["SURVEY_YEAR"].eq(1977)
-)
+cond = df["AGE"].eq(16) & df["HGC"].shift(-1).ge(10) & df["SURVEY_YEAR"].eq(1977)
 df.loc[cond, "CHOICE"] = df.loc[cond, "SPECIFIC_CHOICE"] = "schooling"
-df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = df.loc[cond, "aux_schooling"] - 1
+df.loc[cond, "HGC"] = df.loc[cond, "aux_schooling"] - 1
 
 cond = (
     df["AGE"].eq(16)
-    & df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).eq(9)
+    & df["HGC"].shift(-1).eq(9)
     & df["SURVEY_YEAR"].eq(1977)
     & df["CHOICE"].shift(-1).eq("schooling")
 )
 df.loc[cond, "CHOICE"] = df.loc[cond, "SPECIFIC_CHOICE"] = "schooling"
-df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = df.loc[cond, "aux_schooling"] - 1
+df.loc[cond, "HGC"] = df.loc[cond, "aux_schooling"] - 1
 
 cond = df["AGE"].eq(16) & df["SURVEY_YEAR"].eq(1977) & df["CHOICE"].ne("schooling")
-df.loc[cond, "REAL_HIGHEST_GRADE_COMPLETED"] = df.loc[cond, "aux_schooling"]
+df.loc[cond, "HGC"] = df.loc[cond, "aux_schooling"]
 
 cond = df["CHOICE"].eq("schooling") & ~df["INCOME"].isna()
 df.loc[cond, "INCOME"] = np.nan
 
-
-df["aux_schooling"] = df["REAL_HIGHEST_GRADE_COMPLETED"].copy().shift(-1)
+df["aux_schooling"] = df["HGC"].copy().shift(-1)
 cond_1 = df["AGE"].eq(15) & df["SURVEY_YEAR"].isin([1976, 1977])
-cond_2 = df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).ge(9)
+cond_2 = df["HGC"].shift(-1).ge(9)
 df.loc[cond_1 & cond_2, "CHOICE"] = "schooling"
-df.loc[cond_1 & cond_2, "REAL_HIGHEST_GRADE_COMPLETED"] = (
-    df.loc[cond_1 & cond_2, "aux_schooling"] - 1
-)
+df.loc[cond_1 & cond_2, "HGC"] = df.loc[cond_1 & cond_2, "aux_schooling"] - 1
 
-cond_2 = df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).le(8)
+cond_2 = df["HGC"].shift(-1).le(8)
 df.loc[cond_1 & cond_2, "CHOICE"] = "home"
-df.loc[cond_1 & cond_2, "REAL_HIGHEST_GRADE_COMPLETED"] = df.loc[cond_1 & cond_2, "aux_schooling"]
+df.loc[cond_1 & cond_2, "HGC"] = df.loc[cond_1 & cond_2, "aux_schooling"]
 
 cond = df["AGE"].eq(15) & df["CHOICE"].isin(["blue_collar", "white_collar", "military"])
 df.loc[cond, "CHOICE"] = "home"
 
-print(sum(df.loc[df["AGE"].eq(15), "REAL_HIGHEST_GRADE_COMPLETED"].isna()))
+df.drop(columns=["aux_schooling"], inplace=True)
+
 # truncate observations according to footnote 15 on p. 484,
-
-df["CONSECUTIVE_HIGHEST_GRADES_MISSING"] = 0
-
 # Create indicator variable for years which are the first of two consecutive years with missing
-# 'REAL_HIGHEST_GRADE_COMPLETED'
+# 'HGC'
+df["CONSECUTIVE_HIGHEST_GRADES_MISSING"] = 0
 cond = (
-    df["REAL_HIGHEST_GRADE_COMPLETED"].isna()
-    & df["REAL_HIGHEST_GRADE_COMPLETED"].shift(-1).isna()
-    & df["IDENTIFIER"].eq(df["IDENTIFIER"].shift(-1))
+    df["HGC"].isna() & df["HGC"].shift(-1).isna() & df["IDENTIFIER"].eq(df["IDENTIFIER"].shift(-1))
 )
 df.loc[cond, "CONSECUTIVE_HIGHEST_GRADES_MISSING"] = 1
 
@@ -474,8 +461,9 @@ df.loc[cond, "CUTOFF_WORK"] = 1
 df["CUTOFF_WORK"] = df.groupby("IDENTIFIER").CUTOFF_WORK.cumsum()
 df = df[df["CUTOFF_WORK"] == 0]
 
+# We create a variable which indicates the level of schooling an individual has obtained at a
+# given age
 df = df.groupby(df["IDENTIFIER"]).apply(lambda x: get_schooling_experience(x))
-
 
 # Delete all individuals for which baseline schooling (i. e. schooling at age 16) is less than 7
 cond = df["AGE"].eq(16) & df["SCHOOLING"].lt(7)
@@ -483,10 +471,10 @@ schooling_too_low = df.loc[cond, "IDENTIFIER"].unique()
 
 df.drop(index=schooling_too_low, level=0, inplace=True)
 
-# save data set
-df.to_pickle("../../output/data/final/original_extended_final.pkl")
+# save data set with all variables, beginning at age 15
+df.to_pickle(f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/final/ekw_ext_all_vars.pkl")
 
-# create and save continuous data set
+# create and save continuous data set with all variables, beginning at age 15
 cond = df.loc[df["SURVEY_YEAR"].eq(2011), "CHOICE"].isin(
     ["schooling", "blue_collar", "white_collar", "military", "home"]
 )
@@ -494,9 +482,11 @@ continuous_list = list(cond.index.get_level_values(0))
 
 cont_df = df[df["IDENTIFIER"].isin(continuous_list)]
 
-cont_df.to_pickle("../../output/data/final/cont_original_extended_final.pkl")
+cont_df.to_pickle(
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/final/cont_ekw_ext_all_vars.pkl"
+)
 
-# create and save extended replication of original KW97 data set
+# create and save extended replication of original KW97 data set, beginning at age 16
 cond = df["AGE"].ge(16)
 ext_kw_df = df.loc[cond, ["IDENTIFIER", "AGE", "SCHOOLING", "CHOICE", "INCOME"]]
 ext_kw_df.rename(
@@ -509,9 +499,13 @@ ext_kw_df.rename(
     },
     inplace=True,
 )
-ext_kw_df.to_csv("../../../eckstein-keane-wolpin-extended.csv", index=False, sep="\t")
+ext_kw_df.to_csv(
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin-extended.csv",
+    index=False,
+    sep="\t",
+)
 
-# create and save replication of original KW97 data set
+# create and save replication of original KW97 data set, beginning at age 16
 cond = df["AGE"].ge(16) & df["SURVEY_YEAR"].le(1987)
 kw_df = df.loc[cond, ["IDENTIFIER", "AGE", "SCHOOLING", "CHOICE", "INCOME"]]
 kw_df.rename(
@@ -524,4 +518,6 @@ kw_df.rename(
     },
     inplace=True,
 )
-kw_df.to_csv("../../../eckstein-keane-wolpin.csv", index=False, sep="\t")
+kw_df.to_csv(
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin.csv", index=False, sep="\t",
+)
