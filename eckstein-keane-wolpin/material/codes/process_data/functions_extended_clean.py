@@ -212,7 +212,7 @@ def create_military_wages(agent):
     agent["WEEKS_MILITARY_PER_CALENDAR_YEAR"] = 0
 
     agent["WEEKS_MILITARY_PER_CALENDAR_YEAR"] = (
-        agent.loc[:, agent.columns.str.startswith("EMP_STATUS_WK_")].eq(7.0).sum()
+        agent.loc[:, agent.columns.str.startswith("EMP_STATUS_WK_")].eq(7.0).sum(axis=1)
     )
 
     agent["WEEKLY_MILITARY_INCOME"] = (
