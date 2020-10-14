@@ -506,7 +506,7 @@ ext_kw_df.rename(
 ext_kw_df.to_csv(
     f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin-extended.csv",
     index=False,
-    sep="\t",
+    #sep="\t",
 )
 
 # create and save replication of original KW97 data set with experience
@@ -541,11 +541,11 @@ experience_kw_df.rename(
 experience_kw_df.to_csv(
     f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin_with_experiences.csv",
     index=False,
-    sep="\t",
+    #sep="\t",
 )
 
 # create and save replication of original KW97 data set, beginning at age 16
 kw_df = experience_kw_df[["Identifier", "Age", "Schooling", "Choice", "Wage"]]
 kw_df.to_csv(
-    f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin.csv", index=False, sep="\t",
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin.csv", index=False, #sep="\t",
 )
