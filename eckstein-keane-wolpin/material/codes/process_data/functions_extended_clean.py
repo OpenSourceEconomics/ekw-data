@@ -287,3 +287,16 @@ def get_schooling_experience(agent):
     ).cumsum().shift(1).fillna(0)
 
     return agent
+
+
+def get_work_experience(agent):
+    for occ in ["white_collar", "blue_collar", "military"]:
+        agent[occ + "_experience"] = (
+            (agent["CHOICE"] == occ).astype(int).cumsum().shift(1)
+        ).astype("Int64")
+
+    agent["work_experience"] = sum(
+        [agent[occ + "_experience"] for occ in ["white_collar", "blue_collar", "military"]]
+    )
+
+    return agent

@@ -13,6 +13,7 @@ from functions_extended_clean import clean_missing_wages
 from functions_extended_clean import create_wages
 from functions_extended_clean import create_military_wages
 from functions_extended_clean import get_schooling_experience
+from functions_extended_clean import get_working_experience
 
 PROJECT_DIR = Path(os.environ["PROJECT_ROOT"])
 
@@ -471,6 +472,9 @@ schooling_too_low = df.loc[cond, "IDENTIFIER"].unique()
 
 df.drop(index=schooling_too_low, level=0, inplace=True)
 
+# Create the experience variables for the occupations
+df = df.groupby(df["IDENTIFIER"]).apply(lambda x: get_working_experience(x))
+
 # save data set with all variables, beginning at age 15
 df.to_pickle(f"{PROJECT_DIR}/eckstein-keane-wolpin/material/output/data/final/ekw_ext_all_vars.pkl")
 
@@ -505,19 +509,43 @@ ext_kw_df.to_csv(
     sep="\t",
 )
 
-# create and save replication of original KW97 data set, beginning at age 16
+# create and save replication of original KW97 data set with experience
+# variables, beginning at age 16
 cond = df["AGE"].ge(16) & df["SURVEY_YEAR"].le(1987)
-kw_df = df.loc[cond, ["IDENTIFIER", "AGE", "SCHOOLING", "CHOICE", "INCOME"]]
-kw_df.rename(
+experience_kw_df = df.loc[
+    cond,
+    [
+        "IDENTIFIER",
+        "AGE",
+        "SCHOOLING",
+        "CHOICE",
+        "INCOME",
+        "blue_collar_experience",
+        "white_collar_experience",
+        "military_experience",
+    ],
+]
+experience_kw_df.rename(
     columns={
         "IDENTIFIER": "Identifier",
         "AGE": "Age",
         "SCHOOLING": "Schooling",
         "CHOICE": "Choice",
         "INCOME": "Wage",
+        "blue_collar_experience": "Experience_Blue_Collar",
+        "white_collar_experience": "Experience_White_Collar",
+        "military_experience": "Experience_Military",
     },
     inplace=True,
 )
+experience_kw_df.to_csv(
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin_with_experiences.csv",
+    index=False,
+    sep="\t",
+)
+
+# create and save replication of original KW97 data set, beginning at age 16
+kw_df = experience_kw_df[["Identifier", "Age", "Schooling", "Choice", "Wage"]]
 kw_df.to_csv(
     f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin.csv", index=False, sep="\t",
 )
