@@ -289,7 +289,7 @@ def get_schooling_experience(agent):
     return agent
 
 
-def get_work_experience(agent):
+def get_working_experience(agent):
     for occ in ["white_collar", "blue_collar", "military"]:
         agent[occ + "_experience"] = (
             (agent["CHOICE"] == occ).astype(int).cumsum().shift(1)
