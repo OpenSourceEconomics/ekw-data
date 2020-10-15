@@ -529,7 +529,7 @@ experience_kw_df.rename(
     columns={
         "IDENTIFIER": "Identifier",
         "AGE": "Age",
-        "SCHOOLING": "Schooling",
+        "SCHOOLING": "Experience_School",
         "CHOICE": "Choice",
         "INCOME": "Wage",
         "blue_collar_experience": "Experience_Blue_Collar",
@@ -545,7 +545,7 @@ experience_kw_df.to_csv(
 )
 
 # create and save replication of original KW97 data set, beginning at age 16
-kw_df = experience_kw_df[["Identifier", "Age", "Schooling", "Choice", "Wage"]]
+kw_df = experience_kw_df[["Identifier", "Age", "Choice", "Wage"]]
 kw_df.to_csv(
     f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin.csv", index=False, #sep="\t",
 )
