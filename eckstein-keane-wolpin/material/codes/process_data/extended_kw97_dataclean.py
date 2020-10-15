@@ -491,61 +491,44 @@ cont_df.to_pickle(
 )
 
 # create and save extended replication of original KW97 data set, beginning at age 16
-cond = df["AGE"].ge(16)
-ext_kw_df = df.loc[cond, ["IDENTIFIER", "AGE", "SCHOOLING", "CHOICE", "INCOME"]]
-ext_kw_df.rename(
-    columns={
-        "IDENTIFIER": "Identifier",
-        "AGE": "Age",
-        "SCHOOLING": "Schooling",
-        "CHOICE": "Choice",
-        "INCOME": "Wage",
-    },
-    inplace=True,
-)
-ext_kw_df.to_csv(
-    f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin-extended.csv",
-    index=False,
-    sep="\t",
-)
 
-# create and save replication of original KW97 data set with experience
-# variables, beginning at age 16
-cond = df["AGE"].ge(16) & df["SURVEY_YEAR"].le(1987)
-experience_kw_df = df.loc[
-    cond,
-    [
-        "IDENTIFIER",
-        "AGE",
-        "SCHOOLING",
-        "CHOICE",
-        "INCOME",
-        "blue_collar_experience",
-        "white_collar_experience",
-        "military_experience",
-    ],
-]
-experience_kw_df.rename(
-    columns={
-        "IDENTIFIER": "Identifier",
-        "AGE": "Age",
-        "SCHOOLING": "Schooling",
-        "CHOICE": "Choice",
-        "INCOME": "Wage",
-        "blue_collar_experience": "Experience_Blue_Collar",
-        "white_collar_experience": "Experience_White_Collar",
-        "military_experience": "Experience_Military",
-    },
-    inplace=True,
-)
-experience_kw_df.to_csv(
-    f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin_with_experiences.csv",
-    index=False,
-    sep="\t",
-)
+for suffix, end in [("", 2011), ("_extended", 1987)]:
+    cond = df["AGE"].ge(16) & df["SURVEY_YEAR"].le(end)
+    respy_kw_df = df.loc[
+        cond,
+        [
+            "IDENTIFIER",
+            "AGE",
+            "SCHOOLING",
+            "CHOICE",
+            "INCOME",
+            "blue_collar_experience",
+            "white_collar_experience",
+            "military_experience",
+        ],
+    ]
+    respy_kw_df.rename(
+        columns={
+            "IDENTIFIER": "Identifier",
+            "AGE": "Age",
+            "SCHOOLING": "Schooling",
+            "CHOICE": "Choice",
+            "INCOME": "Wage",
+            "blue_collar_experience": "Experience_Blue_Collar",
+            "white_collar_experience": "Experience_White_Collar",
+            "military_experience": "Experience_Military",
+        },
+        inplace=True,
+    )
+    respy_kw_df.to_csv(
+        f"{PROJECT_DIR}/eckstein-keane-wolpin/respy_eckstein-keane-wolpin{suffix}.csv",
+        index=False,
+        sep="\t",
+    )
 
-# create and save replication of original KW97 data set, beginning at age 16
-kw_df = experience_kw_df[["Identifier", "Age", "Schooling", "Choice", "Wage"]]
-kw_df.to_csv(
-    f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin.csv", index=False, sep="\t",
-)
+    kw_df = respy_kw_df[["Identifier", "Age", "Schooling", "Choice", "Wage"]]
+    kw_df.to_csv(
+        f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin{suffix}.csv",
+        index=False,
+        sep="\t",
+    )
