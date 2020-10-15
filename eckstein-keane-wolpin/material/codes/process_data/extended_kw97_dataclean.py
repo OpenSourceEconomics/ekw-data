@@ -523,12 +523,11 @@ for suffix, end in [("", 2011), ("_extended", 1987)]:
     respy_kw_df.to_csv(
         f"{PROJECT_DIR}/eckstein-keane-wolpin/respy_eckstein-keane-wolpin{suffix}.csv",
         index=False,
-        sep="\t",
     )
 
     kw_df = respy_kw_df[["Identifier", "Age", "Schooling", "Choice", "Wage"]]
     kw_df.to_csv(
         f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin{suffix}.csv",
         index=False,
-        sep="\t",
     )
+
