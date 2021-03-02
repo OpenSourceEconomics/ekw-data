@@ -85,7 +85,11 @@ def get_choices(df):
     table_choices = {}
 
     # Get the total number of choices within each alternative
-    table_choices["total"] = pd.crosstab(index=df["Age"], columns=df["Choice"], margins=True,)
+    table_choices["total"] = pd.crosstab(
+        index=df["Age"],
+        columns=df["Choice"],
+        margins=True,
+    )
     table_choices["total"] = table_choices["total"][crosstab_labels]
     table_choices["total"].columns = [label.split("_")[0].capitalize() for label in crosstab_labels]
 
@@ -120,7 +124,11 @@ def get_average_wages(df):
     """
 
     average_wages = pd.crosstab(
-        index=df["Age"], columns=df["Choice"], values=df["Wage"], aggfunc="mean", margins=True,
+        index=df["Age"],
+        columns=df["Choice"],
+        values=df["Wage"],
+        aggfunc="mean",
+        margins=True,
     )
 
     average_wages.columns = [

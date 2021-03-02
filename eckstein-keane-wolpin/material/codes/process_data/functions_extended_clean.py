@@ -8,8 +8,7 @@ import pandas as pd
 
 
 def get_occ_hours(agent):
-    """This function calculates the amount of hours worked in each occupation in a given year.
-    """
+    """This function calculates the amount of hours worked in each occupation in a given year."""
     for occ in ["white_collar", "blue_collar"]:
 
         agent[occ.upper() + "_HOURS"] = 0
@@ -280,7 +279,7 @@ def create_military_wages(agent):
 
 def get_schooling_experience(agent):
     """This function creates the variable that indicates the level of schooling an individual has
-    obtained at a given age """
+    obtained at a given age"""
     base_schooling = agent.loc[agent["AGE"] == 15, "HGC"].item()
     agent["SCHOOLING"] = base_schooling + (agent["CHOICE"] == "schooling").astype(
         int

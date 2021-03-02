@@ -530,4 +530,3 @@ for suffix, end in [("", 2011), ("_extended", 1987)]:
         f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin{suffix}.csv",
         index=False,
     )
-
