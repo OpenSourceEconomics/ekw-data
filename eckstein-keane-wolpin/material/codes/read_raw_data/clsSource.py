@@ -78,8 +78,7 @@ for month in months:
 
 
 class SourceCls(object):
-    """ This class contains all methods that prepare the source dataset for further uses.
-    """
+    """This class contains all methods that prepare the source dataset for further uses."""
 
     def __init__(self):
 
@@ -90,8 +89,7 @@ class SourceCls(object):
         self.dct = None
 
     def read_source(self, num_agents=None):
-        """ Read the original file from the NLSY INVESTIGATOR.
-        """
+        """Read the original file from the NLSY INVESTIGATOR."""
         # Read from original data from CSV file
         self.source_wide = pd.read_csv(
             f"{PROJECT_DIR}/eckstein-keane-wolpin/material/sources/original_extended.csv",
@@ -106,7 +104,7 @@ class SourceCls(object):
         self.dct = dct
 
     def add_basic_variables(self):
-        """ We add some basic variables that are easily constructed from the original information
+        """We add some basic variables that are easily constructed from the original information
         and frequently used during finer processing of the data.
         """
         # Distribute class attributes
@@ -132,8 +130,7 @@ class SourceCls(object):
         self.source_long = source_long
 
     def transform_wide_to_panel(self):
-        """ Transform from wide to long format.
-        """
+        """Transform from wide to long format."""
         # Distribute class attributes
         survey_years = self.survey_years
         source_wide = self.source_wide
@@ -144,8 +141,7 @@ class SourceCls(object):
         self._set_missing_values()
 
     def _set_missing_values(self):
-        """ This method ensures a uniform setup for the treatment of missing values.
-        """
+        """This method ensures a uniform setup for the treatment of missing values."""
         # Distribute class attributes
         source_long = self.source_long
 
@@ -165,8 +161,7 @@ class SourceCls(object):
                 source_long.loc[cond, varname] = np.nan
 
     def testing(self):
-        """ This method performs some basic consistency checks for the constructed panel.
-        """
+        """This method performs some basic consistency checks for the constructed panel."""
         # Distribute class attributes
         source_long = self.source_long
 
@@ -372,8 +367,7 @@ class SourceCls(object):
         np.testing.assert_equal(set(source_long.columns.values), set(varnames))
 
     def store(self, fname):
-        """ Store the dataset for further processing.
-        """
+        """Store the dataset for further processing."""
         # Distribute class attributes
         source_long = self.source_long
 
@@ -381,14 +375,13 @@ class SourceCls(object):
         source_long.to_pickle(fname)
 
     def load(self, fname):
-        """ Store the dataset for further processing.
-        """
+        """Store the dataset for further processing."""
         # Distribute class attributes
         self.source_long = pd.read_pickle(fname)
 
 
 def wide_to_long(source_wide, additional_level, dct):
-    """ The original data is set up in the wide format. However, we want to work with a typical
+    """The original data is set up in the wide format. However, we want to work with a typical
     panel structure.
     """
     # Set up an empty dataframe with the right index structure. This setup maintains the mapping
@@ -423,8 +416,7 @@ def wide_to_long(source_wide, additional_level, dct):
 
 
 def cpsocc_counts(year, source_long):
-    """ This function returns counts for each of the bins of the variable.
-    """
+    """This function returns counts for each of the bins of the variable."""
     bins = []
     bins += [(1, 195), (201, 245), (260, 285), (301, 395), (401, 575), (580, 590)]
     bins += [(601, 715), (740, 785), (801, 802), (821, 824), (901, 965), (980, 984)]
@@ -435,8 +427,7 @@ def cpsocc_counts(year, source_long):
 
 
 def occall_counts(year, num, source_long):
-    """ This function returns counts for each of the bins of the variable.
-    """
+    """This function returns counts for each of the bins of the variable."""
     bins = []
     bins += [(1, 195), (201, 245), (260, 285), (301, 395), (401, 575), (580, 590), (601, 715)]
     bins += [(740, 785), (801, 802), (821, 824), (901, 965), (980, 984)]
@@ -447,8 +438,7 @@ def occall_counts(year, num, source_long):
 
 
 def wage_hourly_counts(year, num, source_long):
-    """ This function returns counts for each of the bins of the variable.
-    """
+    """This function returns counts for each of the bins of the variable."""
     bins = []
     bins += [(0, 1), (1, 99), (100, 199), (200, 299), (300, 399), (400, 499), (500, 599)]
     bins += [(600, 699), (700, 799), (800, 899), (900, 999), (1000, np.inf)]
@@ -459,8 +449,7 @@ def wage_hourly_counts(year, num, source_long):
 
 
 def emp_hours_counts(year, week, source_long):
-    """ This function returns counts for each of the bins of the variable.
-    """
+    """This function returns counts for each of the bins of the variable."""
     bins = []
     bins += [(0, 0), (1, 9), (10, 19), (20, 29), (30, 39), (40, 49), (50, 59), (60, 69)]
     bins += [(70, 79), (80, 89), (90, 99), (100, np.inf)]
@@ -473,8 +462,7 @@ def emp_hours_counts(year, week, source_long):
 
 
 def emp_status_counts(year, week, source_long):
-    """ This function returns counts for each of the bins of the variable.
-    """
+    """This function returns counts for each of the bins of the variable."""
     bins = []
     bins += [(100, np.inf), (0, 0), (2, 2), (3, 3), (4, 4), (5, 5), (7, 7)]
 
@@ -484,8 +472,7 @@ def emp_status_counts(year, week, source_long):
 
 
 def _get_counts_year(series, bins, year):
-    """ This function gets the counts within each bin of a particular year.
-    """
+    """This function gets the counts within each bin of a particular year."""
     counts = []
     for bounds in bins:
         lower, upper = bounds

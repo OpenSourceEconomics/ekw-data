@@ -519,5 +519,7 @@ kw_df.rename(
     inplace=True,
 )
 kw_df.to_csv(
-    f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin.csv", index=False, sep="\t",
+    f"{PROJECT_DIR}/eckstein-keane-wolpin/eckstein-keane-wolpin.csv",
+    index=False,
+    sep="\t",
 )
