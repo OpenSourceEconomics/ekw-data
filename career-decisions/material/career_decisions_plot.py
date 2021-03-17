@@ -221,7 +221,9 @@ def plot_wage_moments(df, savgol=False, color="color"):
             y_plot.index = list(wage_moments[moment].index)
 
             ax.plot(
-                y_plot, color=make_color_lighter(color_scheme[color][wc], color_scale), label=wc,
+                y_plot,
+                color=make_color_lighter(color_scheme[color][wc], color_scale),
+                label=wc,
             )
 
         ax.legend(

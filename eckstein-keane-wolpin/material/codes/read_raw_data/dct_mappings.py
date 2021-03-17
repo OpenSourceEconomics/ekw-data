@@ -7,7 +7,7 @@ import pandas as pd
 
 
 def get_mappings():
-    """ We process the mappings for two separate cases. (1) Variables that vary by year,
+    """We process the mappings for two separate cases. (1) Variables that vary by year,
     and (2) variables where there are multiple realizations each year.
     """
     # Set up grid for survey years. Note that from 1996 we can only expect information every other
@@ -30,8 +30,7 @@ def get_mappings():
 
 
 def process_time_constant(years):
-    """ We need to process some time-constant variables.
-    """
+    """We need to process some time-constant variables."""
 
     dct_constant = dict()
 
@@ -124,8 +123,7 @@ def process_time_constant(years):
 
 
 def process_multiple_each_year():
-    """ Employment Status for multiple weeks.
-    """
+    """Employment Status for multiple weeks."""
     dct_multiple = dict()
 
     # The mapping between the continuous weeks counter and the calendar year is provided on the
@@ -168,8 +166,7 @@ def process_multiple_each_year():
 
 
 def process_single_each_year():
-    """ We process variables that vary by year, i.e. one variables is available each year.
-    """
+    """We process variables that vary by year, i.e. one variables is available each year."""
     # Initialize containers
     dct = dict()
 
@@ -327,8 +324,7 @@ def process_single_each_year():
 
 
 def get_name(substrings):
-    """ Search through the file by substrings
-    """
+    """Search through the file by substrings"""
     # We allow to pass in a string or a list of strings that are checked in the variable
     # descriptions.
     if type(substrings) == str:
@@ -351,8 +347,7 @@ def get_name(substrings):
 
 
 def get_year_name(substrings):
-    """ Search through the file by substrings.
-    """
+    """Search through the file by substrings."""
     # We allow to pass in a string or a list of strings that are checked in the variable
     # descriptions.
     if type(substrings) == str:
@@ -373,13 +368,12 @@ def get_year_name(substrings):
 
 
 def process_highest_degree_received():
-    """ This function processes the information on the highest degree ever received. There are
+    """This function processes the information on the highest degree ever received. There are
     two different variable in some years with the same information.
     """
 
     def read_highest_degree_received():
-        """ This method reads in the variable names for the highest grade received.
-        """
+        """This method reads in the variable names for the highest grade received."""
         rslt = dict()
         with open("../../sources/original_extended.sdf", "r") as infile:
             for line in infile.readlines():
@@ -414,14 +408,13 @@ def process_highest_degree_received():
 
 
 def process_school_enrollment_monthly():
-    """ This function processes the monthly school enrollment data. This is surprisingly
+    """This function processes the monthly school enrollment data. This is surprisingly
     difficult as, for example, information about March 1990 is asked in the surveys of 1990 and
     1991.
     """
 
     def read_school_enrollment_monthly():
-        """ Search for the information in the short description file.
-        """
+        """Search for the information in the short description file."""
         rslt = dict()
         with open("../../sources/original_extended.sdf", "r") as infile:
             for line in infile.readlines():

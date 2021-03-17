@@ -6,7 +6,7 @@ from numpy.testing import assert_equal
 
 
 def aggregate_highest_degree_received(df):
-    """ This function merges the information about the highest degree ever received. It is
+    """This function merges the information about the highest degree ever received. It is
     sometimes collected under two variable names. However, there is no conflicting information.
     At least one of the two is always a missing value.
     """
@@ -23,8 +23,7 @@ def aggregate_highest_degree_received(df):
 
 
 def cleaning_highest_grade_attended(df):
-    """ The variable contains a value 95 which corresponds to UNGRADED.
-    """
+    """The variable contains a value 95 which corresponds to UNGRADED."""
     cond = df["HIGHEST_GRADE_ATTENDED"] == 95
     df.loc[cond, "HIGHEST_GRADE_ATTENDED"] = np.nan
 
@@ -32,7 +31,7 @@ def cleaning_highest_grade_attended(df):
 
 
 def aggregate_school_enrollment_monthly(df):
-    """ This function merges the information about monthly school enrollment. It is sometimes
+    """This function merges the information about monthly school enrollment. It is sometimes
     collected twice due the differing time an individual is interviewed that year.
     """
     months = []
@@ -67,7 +66,7 @@ def aggregate_school_enrollment_monthly(df):
 
 
 def create_is_interviewed(df):
-    """ This function creates an indicator that evaluates to TRUE if an individual was
+    """This function creates an indicator that evaluates to TRUE if an individual was
     interviewed that year based on the information about the reasons for non-interviews.
     """
     df["IS_INTERVIEWED"] = df["REASON_NONINTERVIEW"].fillna(0) == 0
@@ -76,7 +75,7 @@ def create_is_interviewed(df):
 
 
 def standarize_employer_information(df):
-    """ This function merges the employer-specific information on an individual's occupation
+    """This function merges the employer-specific information on an individual's occupation
     using the 70 CPS codes into a new variable. See additional information at:
 
         https://www.nlsinfo.org/content/cohorts/nlsy79/topical-guide/employment/jobs-employers
@@ -119,7 +118,7 @@ def standarize_job_information(df):
 
 
 def calculate_afqt_scores(df):
-    """ This function calculates the AFQT scores. See information at
+    """This function calculates the AFQT scores. See information at
 
         https://www.nlsinfo.org/content/cohorts/nlsy79/topical-guide/education/aptitude-achievement-intelligence-scores
 
@@ -217,7 +216,7 @@ def calculate_afqt_scores(df):
 
 
 def aggregate_birth_information(df):
-    """ This function aggregates the birth information that was collected in 1979 and 1981. See
+    """This function aggregates the birth information that was collected in 1979 and 1981. See
     information at
 
         https://www.nlsinfo.org/content/cohorts/nlsy79/topical-guide/household/age for
@@ -226,8 +225,7 @@ def aggregate_birth_information(df):
     """
 
     def _construct_birth_info(agent):
-        """ This method constructs the correct birth variable for each agent.
-        """
+        """This method constructs the correct birth variable for each agent."""
         # We want to store the original information for now for debugging and testing purposes.
         for substring in ["YEAR_OF_BIRTH", "MONTH_OF_BIRTH"]:
             for year in [1979, 1981]:
@@ -266,7 +264,7 @@ def aggregate_birth_information(df):
 
 
 def _test_afqt(df):
-    """ The NLSY does provide a percentile information but we reconstruct based on their
+    """The NLSY does provide a percentile information but we reconstruct based on their
     instructions just to be sure.
     """
     # As we break the logic of the code a bit, we work only with copies of the object here.
