@@ -6,24 +6,14 @@ channels:
 
 dependencies:
 - pip
-- pytest=5.4.3
-- jupyterlab
-- black
-- flake8
-- doc8
 - restructuredtext_lint
-- tox-conda
-- sphinx>=1.4
+- ipython
+- ipykernel
+- jupyter
+- jupyter_contrib_nbextensions
+- jupyter_nbextensions_configurator
 - nbsphinx
-- pytest-black
-- pytest-flake8
-- xlrd
-- bulwark
 - pip:
-    - black-nb
-    - flake8-nb
     - sphinx_rtd_theme
     - nbsphinx
-    - cairosvg
     - sphinxcontrib-bibtex>=2.0.0
-    - sphinxcontrib-svg2pdfconverter[CairoSVG]
