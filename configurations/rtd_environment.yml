@@ -1,0 +1,29 @@
+name: ekw-data-rtd
+
+channels:
+  - defaults
+  - conda-forge
+
+dependencies:
+- pip
+- pytest=5.4.3
+- jupyterlab
+- black
+- flake8
+- doc8
+- restructuredtext_lint
+- tox-conda
+- sphinx>=1.4
+- nbsphinx
+- pytest-black
+- pytest-flake8
+- xlrd
+- bulwark
+- pip:
+    - black-nb
+    - flake8-nb
+    - sphinx_rtd_theme
+    - nbsphinx
+    - cairosvg
+    - sphinxcontrib-bibtex
+    - sphinxcontrib-svg2pdfconverter[CairoSVG]
