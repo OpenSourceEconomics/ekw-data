@@ -1,0 +1,19 @@
+name: ekw-data-rtd
+
+channels:
+  - defaults
+  - conda-forge
+
+dependencies:
+- pip
+- restructuredtext_lint
+- ipython
+- ipykernel
+- jupyter
+- jupyter_contrib_nbextensions
+- jupyter_nbextensions_configurator
+- nbsphinx
+- pip:
+    - sphinx_rtd_theme
+    - nbsphinx
+    - sphinxcontrib-bibtex>=2.0.0
